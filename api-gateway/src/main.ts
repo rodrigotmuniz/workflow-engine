@@ -9,6 +9,6 @@ async function bootstrap() {
       json: Boolean(process.env.JSON_LOG || false),
     }),
   });
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.API_GATEWAY_PORT ?? 3000);
 }
 void bootstrap();
