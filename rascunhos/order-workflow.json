@@ -1,0 +1,86 @@
+{
+  "id": "order_processing",
+  "name": "E-commerce Order Processing",
+  "version": "1.4",
+  "description": "Handles order validation, inventory check, payment processing, refund handling, and fulfillment with proper inventory management.",
+  "tasks": [
+    {
+      "id": "validate_order",
+      "type": "service_call",
+      "service": "order-service",
+      "action": "validate",
+      "retry": 3,
+      "timeout": 5000
+    },
+    {
+      "id": "check_inventory",
+      "type": "database_query",
+      "service": "inventory-service",
+      "action": "check_stock",
+      "retry": 2,
+      "timeout": 3000
+    },
+    {
+      "id": "cancel_order",
+      "type": "service_call",
+      "service": "order-service",
+      "action": "cancel",
+      "onFailure": true
+    },
+    {
+      "id": "process_payment",
+      "type": "external_api",
+      "service": "payment-gateway",
+      "action": "charge",
+      "retry": 2,
+      "timeout": 7000,
+      "retryInterval": 300000
+    },
+    {
+      "id": "update_inventory",
+      "type": "database_update",
+      "service": "inventory-service",
+      "action": "deduct_stock"
+    },
+    {
+      "id": "refund_payment",
+      "type": "external_api",
+      "service": "payment-gateway",
+      "action": "refund",
+      "onFailure": true
+    },
+    {
+      "id": "restock_inventory",
+      "type": "database_update",
+      "service": "inventory-service",
+      "action": "restock",
+      "onFailure": true
+    },
+    {
+      "id": "send_confirmation_email",
+      "type": "notification",
+      "service": "email-service",
+      "action": "send",
+      "retry": 1
+    },
+    {
+      "id": "notify_failure",
+      "type": "notification",
+      "service": "admin-alert-service",
+      "action": "send_alert",
+      "onFailure": true
+    }
+  ],
+  "transitions": [
+    { "from": "validate_order", "to": "check_inventory", "onSuccess": true },
+    { "from": "check_inventory", "to": ["process_payment", "test"], "onSuccess": true },
+    { "from": "check_inventory", "to": "cancel_order", "onFailure": true },
+    { "from": ["process_payment", "test"], "to": "update_inventory", "onSuccess": true },
+    { "from": "process_payment", "to": "notify_failure", "onFailure": true },
+    { "from": "update_inventory", "to": "send_confirmation_email", "onSuccess": true },
+    { "from": "update_inventory", "to": "refund_payment", "onFailure": true },
+    { "from": "refund_payment", "to": "restock_inventory", "onSuccess": true },
+    { "from": "refund_payment", "to": "notify_failure", "onFailure": true }
+  ]
+}
+
