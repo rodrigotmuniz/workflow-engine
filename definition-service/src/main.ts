@@ -1,16 +1,16 @@
-import { ConsoleLogger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
-import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 import { AppModule } from './app.module'
+import { ConsoleLogger, ValidationPipe } from '@nestjs/common'
+import { MicroserviceOptions } from '@nestjs/microservices'
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     options: {
       host: '0.0.0.0',
-      port: Number(process.env.WFM_CLIENT || 3002),
+      port: Number(process.env.DEFINITION_PORT || 3003),
     },
     logger: new ConsoleLogger({
-      prefix: 'WFM Service',
+      prefix: 'Defintions Service',
       json: Boolean(process.env.JSON_LOG || false),
     }),
   })

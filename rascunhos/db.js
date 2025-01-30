@@ -19,7 +19,8 @@ const a = {
       id: number,
       definition: json,
       name: string,
-      definitionId: number
+      definitionId: number,
+      status: string // UPDATED, DELETED
     }
   },
   

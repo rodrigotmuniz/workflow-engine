@@ -6,7 +6,7 @@ export class WfmClientController {
   private readonly logger = new Logger(WfmClientController.name)
 
   constructor(
-    @Inject(process.env.WFM_CLIENT_CLIENT || 'WFM_CLIENT_CLIENT')
+    @Inject(process.env.WFM_CLIENT || 'WFM_CLIENT')
     private readonly clientProxy: ClientProxy,
   ) {}
 
