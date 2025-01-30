@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { TaskQueuesService } from './task-queues.service';
 import { CreateTaskQueueDto } from './dto/create-task-queue.dto';
@@ -6,6 +6,8 @@ import { UpdateTaskQueueDto } from './dto/update-task-queue.dto';
 
 @Controller()
 export class TaskQueuesController {
+  private readonly logger = new Logger(TaskQueuesController.name)
+
   constructor(private readonly taskQueuesService: TaskQueuesService) {}
 
   @MessagePattern('createTaskQueue')
@@ -15,6 +17,7 @@ export class TaskQueuesController {
 
   @MessagePattern('findAllTaskQueues')
   findAll() {
+    this.logger.log('findAll()')
     return this.taskQueuesService.findAll();
   }
 

@@ -1,8 +1,10 @@
-import { Controller, Get, Inject } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Controller, Get, Inject, Logger } from '@nestjs/common'
+import { ClientProxy } from '@nestjs/microservices'
 
 @Controller('wfm')
 export class WfmClientController {
+  private readonly logger = new Logger(WfmClientController.name)
+
   constructor(
     @Inject(process.env.WFM_CLIENT_CLIENT || 'WFM_CLIENT_CLIENT')
     private readonly clientProxy: ClientProxy,
@@ -10,6 +12,7 @@ export class WfmClientController {
 
   @Get()
   findAll() {
-    return this.clientProxy.send('findAllWfms', {});
+    this.logger.log('findAll()')
+    return this.clientProxy.send('findAllWfms', {})
   }
 }

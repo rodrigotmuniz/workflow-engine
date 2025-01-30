@@ -1,4 +1,4 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { WfmsService } from './wfms.service';
 import { CreateWfmDto } from './dto/create-wfm.dto';
@@ -6,6 +6,8 @@ import { UpdateWfmDto } from './dto/update-wfm.dto';
 
 @Controller()
 export class WfmsController {
+  private readonly logger = new Logger(WfmsController.name)
+  
   constructor(private readonly wfmsService: WfmsService) {}
 
   @MessagePattern('createWfm')
@@ -15,6 +17,8 @@ export class WfmsController {
 
   @MessagePattern('findAllWfms')
   findAll() {
+    this.logger.log('findAll()')
+    
     return this.wfmsService.findAll();
   }
 
