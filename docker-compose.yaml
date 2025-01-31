@@ -4,7 +4,7 @@ services:
     image: redis:latest
     container_name: redis
     ports:
-      - "6379:6379"
+      - "6000:6379"
 
   definitions-db:
     image: postgres:15
@@ -14,14 +14,27 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: definitions
     ports:
-      - '5003:5432'
+      - '5004:5432'
     volumes:
       - definitions-db-data:/var/lib/postgresql/data
+
+  states-db:
+    image: postgres:15
+    container_name: states-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: states
+    ports:
+      - '5003:5432'
+    volumes:
+      - states-db-data:/var/lib/postgresql/data
 
 
 
 volumes:
   definitions-db-data:
+  states-db-data:
   # server-a:
   #   build: ./server-a
   #   container_name: server-a

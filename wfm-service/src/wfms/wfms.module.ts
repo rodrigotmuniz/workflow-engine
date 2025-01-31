@@ -16,7 +16,7 @@ import { ConfigModule } from '@nestjs/config'
       name: process.env.TASK_QUEUE_CLIENT || 'TASK_QUEUE_CLIENT',
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
-        port: Number(process.env.REDIS_PORT || 6379),
+        port: Number(process.env.REDIS_PORT || 6000),
       },
     }),
   ],
