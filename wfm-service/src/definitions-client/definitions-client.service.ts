@@ -1,6 +1,7 @@
 import { BadGatewayException, ConflictException, Inject, Injectable, Logger } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
+import { WorkflowDefinitionDto } from './dto/wf-definition.dto'
 
 @Injectable()
 export class DefinitionsClientService {
@@ -12,8 +13,8 @@ export class DefinitionsClientService {
   ) {}
 
   async findJsonDefinitionByName(name: string) {
-      const observable = this.clientProxy.send('[PATTERN]findJsonDefinitionByName', name)
-      const data = await firstValueFrom<{ data: boolean }>(observable)
-      return data
+    const observable = this.clientProxy.send('[PATTERN]findJsonDefinitionByName', name)
+    const { data } = await firstValueFrom<{ data: WorkflowDefinitionDto }>(observable)
+    return data
   }
 }

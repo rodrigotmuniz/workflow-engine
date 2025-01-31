@@ -26,9 +26,9 @@ const a = {
   'wfm-service ': {
     'workflow-instances-db': {
       id: number,
-      definitionId: number,
+      definitionName: string,
       currentStates: [string], // taskIds
-      status: ENUM(['pending', 'running', 'failed', 'completed'])
+      status: ENUM(['PENDING', 'RUNNING', 'FAILED', 'COMPLETED'])
     },
     'task-executions-db': {
       id: number,

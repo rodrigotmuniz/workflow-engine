@@ -14,7 +14,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: definitions
     ports:
-      - '5004:5432'
+      - '5003:5432'
     volumes:
       - definitions-db-data:/var/lib/postgresql/data
 
@@ -26,7 +26,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: states
     ports:
-      - '5003:5432'
+      - '5004:5432'
     volumes:
       - states-db-data:/var/lib/postgresql/data
 
