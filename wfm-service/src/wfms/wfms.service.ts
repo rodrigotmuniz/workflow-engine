@@ -11,6 +11,11 @@ export class WfmsService {
   async run(runInWfmDto: RunInWfmDto) {
     this.logger.log('run()')
 
-    return await this.definitionsClientService.findJsonDefinitionByName(runInWfmDto.name)
+    const definition = await this.definitionsClientService.findJsonDefinitionByName(runInWfmDto.name)
+    // - [ ]  Validate: [TASK_QUEUE]
+    // - [ ]  all task executors exists [TASK_QUEUE]
+    // - [ ]  task executors' dto are mapped [TASK_QUEUE]
+
+    return definition
   }
 }
