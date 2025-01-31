@@ -1,29 +1,16 @@
-import { Injectable } from '@nestjs/common'
-import { CreateWfmDto } from './dto/create-wfm.dto'
+import { Injectable, Logger } from '@nestjs/common'
+import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
+import { RunInWfmDto } from './dto/run-in-wfm.dto'
 import { UpdateWfmDto } from './dto/update-wfm.dto'
-import { TaskQueuesService } from './services/task-queues.service'
 
 @Injectable()
 export class WfmsService {
-  constructor(private readonly taskQueuesService: TaskQueuesService) {}
+  private readonly logger = new Logger(WfmsService.name)
+  constructor(private readonly definitionsClientService: DefinitionsClientService) {}
 
-  create(createWfmDto: CreateWfmDto) {
-    return 'This action adds a new wfm'
-  }
+  async run(runInWfmDto: RunInWfmDto) {
+    this.logger.log('run()')
 
-  async findAll() {
-    return await this.taskQueuesService.find()
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} wfm`
-  }
-
-  update(id: number, updateWfmDto: UpdateWfmDto) {
-    return `This action updates a #${id} wfm`
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} wfm`
+    return await this.definitionsClientService.findJsonDefinitionByName(runInWfmDto.name)
   }
 }

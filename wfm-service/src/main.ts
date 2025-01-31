@@ -1,10 +1,12 @@
 import { ConsoleLogger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
-import { AppModule } from './app.module'
+import { WfmsModule } from './wfms/wfms.module'
+import { ResponseInterceptor } from './commons/interceptors/response.interceptor'
+import { AppAllExceptionsFilter } from './commons/filters/app-all-exceptions.filter'
 
 async function bootstrap() {
-  const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(WfmsModule, {
     options: {
       host: '0.0.0.0',
       port: Number(process.env.WFM_PORT),
@@ -23,7 +25,8 @@ async function bootstrap() {
     }),
   )
 
-  // app.useGlobalInterceptors(new ResponseInterceptor())
+  app.useGlobalInterceptors(new ResponseInterceptor())
+  app.useGlobalFilters(new AppAllExceptionsFilter())
 
   await app.listen()
 }

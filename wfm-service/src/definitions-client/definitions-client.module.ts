@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
-import { DefinitionsClientController } from './definitions-client.controller'
-import { ClientsModule, Transport } from '@nestjs/microservices'
+import { ClientProxy, ClientsModule } from '@nestjs/microservices'
+import { DefinitionsClientService } from './definitions-client.service'
 
 @Module({
   imports: [
@@ -9,11 +9,12 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
         name: process.env.DEFINITION_CLIENT || 'DEFINITION_CLIENT',
         options: {
           host: process.env.DEFINITION_HOST ?? 'localhost',
-          port: Number(process.env.DEFINITION_PORT || 3004),
+          port: Number(process.env.DEFINITION_PORT || 3003),
         },
       },
     ]),
   ],
-  controllers: [DefinitionsClientController],
+  providers: [DefinitionsClientService],
+  exports: [DefinitionsClientService]
 })
 export class DefinitionsClientModule {}

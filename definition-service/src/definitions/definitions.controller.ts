@@ -28,9 +28,9 @@ export class DefinitionsController {
     return this.definitionsService.findByName(name)
   }
 
-  @MessagePattern('findJsonDefinitionByName')
+  @MessagePattern('[PATTERN]findJsonDefinitionByName')
   findJsonDefinitionByName(@Payload() name: string) {
-    this.logger.log('findJsonDefinitionByName()')
+    this.logger.log(`findJsonDefinitionByName(): ${JSON.stringify(name, null, 2)}`)
     return this.definitionsService.findJsonDefinitionByName(name)
   }
 

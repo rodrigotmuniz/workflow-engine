@@ -5,18 +5,13 @@ import { WfmsService } from './wfms.service'
 import { ClientsModule } from '@nestjs/microservices'
 import { BullModule } from '@nestjs/bull'
 import { ServerBProcessor } from './task-queues.processor'
+import { DefinitionsClientModule } from 'src/definitions-client/definitions-client.module'
+import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
+import { ConfigModule } from '@nestjs/config'
 
 @Module({
   imports: [
-    // ClientsModule.register([
-    //   {
-    //     name: process.env.TASK_QUEUE_CLIENT || 'TASK_QUEUE_CLIENT',
-    //     options: {
-    //       host: process.env.TASK_QUEUE_HOST ?? 'localhost',
-    //       port: Number(process.env.TASK_QUEUE_PORT || 3003),
-    //     },
-    //   },
-    // ]),
+    DefinitionsClientModule, 
     BullModule.registerQueue({
       name: process.env.TASK_QUEUE_CLIENT || 'TASK_QUEUE_CLIENT',
       redis: {

@@ -19,7 +19,7 @@ export class ResponseInterceptor implements NestInterceptor {
         }
 
         const responseData = response.data ? response : { data: response }
-        this.logger.log(`Returning response for ${method}: ${JSON.stringify(responseData, null, 2)}`)
+        this.logger.log(`Returning response for ${method}: ${JSON.stringify(responseData)}`)
         return responseData
       }),
     )
