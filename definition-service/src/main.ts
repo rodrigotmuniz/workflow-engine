@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { ConsoleLogger, ValidationPipe } from '@nestjs/common'
 import { MicroserviceOptions } from '@nestjs/microservices'
+import { ResponseInterceptor } from './commons/interceptors/response.interceptor'
 
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
@@ -23,7 +24,7 @@ async function bootstrap() {
     }),
   )
 
-  // app.useGlobalInterceptors(new ResponseInterceptor())
+  app.useGlobalInterceptors(new ResponseInterceptor())
 
   await app.listen()
 }

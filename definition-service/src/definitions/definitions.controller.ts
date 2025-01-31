@@ -1,8 +1,8 @@
 import { Controller, Logger } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
+import { DefinitionsPattern } from '@rodrigotmuniz/patterns'
 import { DefinitionsService } from './definitions.service'
 import { CreateDefinitionDto } from './dto/create-definition.dto'
-import { UpdateDefinitionDto } from './dto/update-definition.dto'
 
 @Controller()
 export class DefinitionsController {
@@ -10,30 +10,33 @@ export class DefinitionsController {
 
   constructor(private readonly definitionsService: DefinitionsService) {}
 
-  @MessagePattern('createDefinition')
+  @MessagePattern(DefinitionsPattern.CREATE)
   create(@Payload() createDefinitionDto: CreateDefinitionDto) {
+    this.logger.log('create()')
     return this.definitionsService.create(createDefinitionDto)
   }
 
-  @MessagePattern('DefinitionsController')
+  @MessagePattern(DefinitionsPattern.FIND_ALL)
   findAll() {
     this.logger.log('findAll()')
-
     return this.definitionsService.findAll()
   }
 
-  @MessagePattern('findOneDefinition')
-  findOne(@Payload() id: number) {
-    return this.definitionsService.findOne(id)
+  @MessagePattern(DefinitionsPattern.FIND_BY_NAME)
+  findByName(@Payload() name: string) {
+    this.logger.log('findByName()')
+    return this.definitionsService.findByName(name)
   }
 
-  @MessagePattern('updateDefinition')
-  update(@Payload() updateDefinitionDto: UpdateDefinitionDto) {
-    return this.definitionsService.update(updateDefinitionDto.id, updateDefinitionDto)
+  @MessagePattern('findJsonDefinitionByName')
+  findJsonDefinitionByName(@Payload() name: string) {
+    this.logger.log('findJsonDefinitionByName()')
+    return this.definitionsService.findJsonDefinitionByName(name)
   }
 
-  @MessagePattern('removeDefinition')
-  remove(@Payload() id: number) {
-    return this.definitionsService.remove(id)
-  }
+  // @MessagePattern(DefinitionsPattern.REMOVE)
+  // remove(@Payload() id: number) {
+  //   this.logger.log('remove()')
+  //   return this.definitionsService.remove(id)
+  // }
 }

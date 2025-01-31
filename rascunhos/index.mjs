@@ -47,3 +47,10 @@ export class WorkflowProcessor {
 
 const processor = new WorkflowProcessor()
 processor.handleTask({ data: { workflowId: 'myWorkflow', taskId: 'B' } })
+
+
+import fs from 'fs'
+
+const file = fs.readFileSync('./order-workflow.json', {encoding: 'utf-8'})
+// import bla from './order-workflow.json'
+console.log(JSON.stringify(file))

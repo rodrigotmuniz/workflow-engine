@@ -1,21 +1,20 @@
-api-gateway
-auth-service
+// api-gateway
+// auth-service
 
-task-queue-service 
-n x task-executor-service 
-integration-service 
-auth-db
-user-db
-
+// task-queue-service
+// n x task-executor-service
+// integration-service
+// auth-db
+// user-db
 
 const a = {
-  "definition-service": {
-    "definitions-db" : {
+  'definition-service': {
+    'definitions-db': {
       id: number,
       definition: json,
       name: string
     },
-    "definitions-history-db": {
+    'definitions-history-db': {
       id: number,
       definition: json,
       name: string,
@@ -23,33 +22,62 @@ const a = {
       status: string // UPDATED, DELETED
     }
   },
-  
- "wfm-service ":{
-    "workflow-instances-db":{
+
+  'wfm-service ': {
+    'workflow-instances-db': {
       id: number,
       definitionId: number,
       currentStates: [string], // taskIds
       status: ENUM(['pending', 'running', 'failed', 'completed'])
     },
-    "task-executions-db":{
+    'task-executions-db': {
       id: number,
       definitionId: string,
-      workflowInstanceId: number ,
+      workflowInstanceId: number,
 
       dependencies: [string],
-      toTaskId: [string], // names}
-  
+      // toTaskId: [string], // names} onFailure or onSuccess
+
       taskId: string,
-      taskType: string ,
+      taskType: string,
       taskService: string,
       taskAction: string,
       taskRetry: number,
       taskTimeout: number,
-  
-      onFailure?: [string], // taskName
-      onSuccess?: [string], // taskName
 
-      status: ENUM(['pending', 'running', 'failed', 'completed']),
-    },
+      onFailure: [string], // taskName
+      onSuccess: [string], // taskName
+
+      input: {},
+      output: {},
+
+      status: ENUM(['pending', 'running', 'failed', 'completed'])
+    }
   }
+}
+
+const eventEmit = {
+  id: number,
+
+  taskId: string,
+  taskType: string,
+  taskService: string,
+  taskAction: string,
+  taskRetry: number,
+  taskTimeout: number,
+
+  input: {}
+}
+
+const eventResponse = {
+  id: number,
+
+  taskId: string,
+  taskType: string,
+  taskService: string,
+  taskAction: string,
+  taskRetry: number,
+  taskTimeout: number,
+
+  output: {}
 }
