@@ -74,11 +74,15 @@ export class TaskExecutionsService {
         .set({
           dependencies: () => `array_remove(dependencies, '${dependencyId}')`,
         })
-        .where('taskId IN (:...taskIds) AND wfInstanceId = :wfInstanceId', { taskIds, wfInstanceId })
+        .where(' taskId IN (:...taskIds)  AND wfInstanceId = :wfInstanceId  AND :dependencyId = ANY(dependencies) ', {
+          taskIds,
+          wfInstanceId,
+          dependencyId,
+        })
         .returning('*')
         .execute()
 
-      this.logger.debug(`result: ${JSON.stringify({ result }, null, 2)}`)
+      // this.logger.debug(`result: ${JSON.stringify({ result }, null, 2)}`)
       const updatedExecution = result.raw[0]
       return updatedExecution
     } catch (error) {
