@@ -34,7 +34,6 @@ import { WfmsProcessor } from './wfms.processor'
     WfmsService,
     EventEmitterService,
     WfmsProcessor,
-    // ServerBProcessor,
     TaskEventEmitter,
   ],
 })

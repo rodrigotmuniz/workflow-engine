@@ -12,9 +12,9 @@ export class TaskQueuesProcessor {
 
     console.log('Process...')
     setTimeout(() => {
-      this.eventEmitterService.emitEvent(job.name, 'Going back!!!')
+      this.eventEmitterService.emitEvent(job.name, job.data)
       console.log('Done!')
-    }, 3000)
+    }, 1000)
     // console.log('onTaskCompleted')
     // this.taskEventEmitter.onTaskCompleted('bla', 'ble', (data) => console.log(1111111111, data))
     // setTimeout(() => {

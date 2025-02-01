@@ -12,10 +12,10 @@ export class TaskExecution {
   @Column({ type: 'enum', enum: Status })
   status: Status
 
-  @Column()
+  @Column({name: 'wf_instance_id'})
   wfInstanceId: number
 
-  @Column('simple-array', { default: [] })
+  @Column("text", { array: true })
   dependencies: string[]
 
   @Column()

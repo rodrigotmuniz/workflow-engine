@@ -43,4 +43,16 @@ export class WfmsService {
     const initialExecutions = taskExecutions.filter((execution) => !execution.dependencies.length)
     return initialExecutions
   }
+
+  async initTasks(initTaskIds: number, fromTaskId: string, wfInstanceId: number) {
+    this.logger.log(`initTasks: ${JSON.stringify({ initTaskIds, fromTaskId, wfInstanceId }, null, 2)}`)
+
+    const initTaskId = initTaskIds[0] // ! TODO: Passar para array a chamada abaixo
+    const taskExecution = await this.taskExecutionsClientService.findOneByTaskIdAndWfInstanceId(initTaskId, wfInstanceId)
+
+    this.logger.debug(`taskExecution: ${JSON.stringify(taskExecution, null, 2)}`)
+
+    const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id,fromTaskId)
+    return removed
+  }
 }

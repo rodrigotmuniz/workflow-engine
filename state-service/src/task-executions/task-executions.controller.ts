@@ -20,4 +20,26 @@ export class TaskExecutionsController {
     this.logger.log('createMany()')
     return this.taskExecutionsService.createMany(createTaskExecutionDtos)
   }
+
+  @MessagePattern('[PATTERN]TaskExecutionsController.findById')
+  findById(@Payload() id: number) {
+    this.logger.log('findById()')
+    return this.taskExecutionsService.findById(id)
+  }
+
+  @MessagePattern('[PATTERN]TaskExecutionsController.removeDependency')
+  removeDependency(@Payload() payload: { id: number; taskId: string }) {
+    this.logger.log(`removeDependency: ${JSON.stringify(payload, null, 2)}`)
+
+    const { id, taskId } = payload
+    return this.taskExecutionsService.removeDependency(id, taskId)
+  }
+
+  @MessagePattern('[PATTERN]TaskExecutionsController.findOneByTaskIdAndWfInstanceId')
+  findOneByTaskIdAndWfInstanceId(@Payload() payload: { taskId: string; wfInstanceId: number }) {
+    this.logger.log(`findOneByTaskIdAndWfInstanceId: ${JSON.stringify(payload, null, 2)}`)
+
+    const { wfInstanceId, taskId } = payload
+    return this.taskExecutionsService.findOneByTaskIdAndWfInstanceId(taskId, wfInstanceId)
+  }
 }

@@ -16,7 +16,7 @@ export class EventEmitterService {
 
   async emitEvent(eventType: string, payload: any) {
     console.log(`🔹 Emitting dynamic event: ${eventType}`, payload)
-    const a = await this.wfmQueue.add(eventType, payload, { removeOnComplete: true })
+    const a = await this.wfmQueue.add(eventType, { data: payload, succeed: true }, { removeOnComplete: true })
     console.log('mensagem enviada: ', a.data)
   }
 

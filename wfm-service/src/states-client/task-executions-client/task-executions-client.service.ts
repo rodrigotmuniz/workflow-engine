@@ -14,6 +14,26 @@ export class TaskExecutionsClientService {
     private readonly clientProxy: ClientProxy,
   ) {}
 
+  async findById(id: number) {
+    const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.findById', id)
+    const { data } = await firstValueFrom<{ data: any }>(observable)
+    return data
+  }
+
+  async findOneByTaskIdAndWfInstanceId(taskId: string, wfInstanceId: number) {
+    const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.findOneByTaskIdAndWfInstanceId', { taskId, wfInstanceId })
+    const { data } = await firstValueFrom<{ data: any }>(observable)
+    return data
+  }
+
+  async removeDependency(id: number, taskId: string) {
+    this.logger.log(`removeDependency: ${JSON.stringify({ id, taskId }, null, 2)}`)
+
+    const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.removeDependency', { id, taskId })
+    const { data } = await firstValueFrom<{ data: any }>(observable)
+    return data
+  }
+
   async create(createTaskExecutionDto: CreateTaskExecutionDto) {
     const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.create', createTaskExecutionDto)
     const { data } = await firstValueFrom<{ data: any }>(observable)
