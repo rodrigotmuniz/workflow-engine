@@ -1,5 +1,5 @@
-import { Status } from 'src/states-client/enums/status.enum'
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
+import { Status } from 'src/commons/enums/status.enum'
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
 
 @Entity('wf_instances')
 export class WfInstance {

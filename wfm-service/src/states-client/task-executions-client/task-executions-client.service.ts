@@ -2,8 +2,9 @@ import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { WorkflowDefinitionDto } from 'src/definitions-client/dto/wf-definition.dto'
+import { Status } from '../../commons/enums/status.enum'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
-import { Status } from '../enums/status.enum'
+import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler'
 
 @Injectable()
 export class TaskExecutionsClientService {
@@ -35,11 +36,22 @@ export class TaskExecutionsClientService {
   }
 
   async removeDependencyByIds(taskIds: string[], wfInstanceId: number, dependencyId: string) {
-    this.logger.log(`removeDependencyByIds: ${JSON.stringify({ taskIds, wfInstanceId, dependencyId }, null, 2)}`)
+    try {
+      this.logger.log(`removeDependencyByIds: ${JSON.stringify({ taskIds, wfInstanceId, dependencyId }, null, 2)}`)
+      
+      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.removeDependencyByIds', {
+        taskIds,
+        wfInstanceId,
+        dependencyId,
+      })
+      const { data } = await firstValueFrom<{ data: any }>(observable)
+      return data
+    } catch(error) {
+      const errorMessage = `removeDependencyByIds: ${JSON.stringify({ error }, null, 2)}`
+      this.logger.error(errorMessage)
 
-    const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.removeDependencyByIds', { taskIds, wfInstanceId, dependencyId })
-    const { data } = await firstValueFrom<{ data: any }>(observable)
-    return data
+      throw new ExceptionsHandler(error)
+    }
   }
 
   async create(createTaskExecutionDto: CreateTaskExecutionDto) {

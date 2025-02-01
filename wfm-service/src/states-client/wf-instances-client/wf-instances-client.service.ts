@@ -1,9 +1,9 @@
 import { Inject, Injectable, Logger } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
-import { CreateWfInstanceDto } from './dto/create-wf-instance.dto'
 import { WorkflowDefinitionDto } from 'src/definitions-client/dto/wf-definition.dto'
-import { Status } from '../enums/status.enum'
+import { Status } from '../../commons/enums/status.enum'
+import { CreateWfInstanceDto } from './dto/create-wf-instance.dto'
 import { WfInstance } from './entities/wf-instance.entity'
 
 @Injectable()

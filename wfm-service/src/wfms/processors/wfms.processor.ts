@@ -11,32 +11,13 @@ export class WfmsProcessor {
   @Process('*')
   async handleTask(job: Job) {
     this.logger.log(`emitWfmQueueEvent: ${JSON.stringify({ name: job.name, data: job.data }, null, 2)} | [PID ${process.pid}]`)
-    //   {
-    //     definitionId: 'order_processing',
-    //     status: 'PENDING',
-    //     wfInstanceId: 68,
-    //     dependencies: [],
-    //     taskId: 'A',
-    //     taskType: 'service_call',
-    //     taskService: 'order-service',
-    //     taskAction: 'validate',
-    //     taskRetry: 3,
-    //     taskTimeout: 5000,
-    //     onFailure: [],
-    //     onSuccess: [ 'B' ],
-    //     input: null,
-    //     output: null,
-    //     id: 101
-    //   },
-    //   succeed: true
-    // }
 
     const jobData = job.data
-    if (jobData.succeed) {
-      const { onSuccess, taskId, wfInstanceId } = jobData.data
-      this.logger.debug(`Init: ${onSuccess} | ${taskId}}`)
-      const a = await this.wfmsService.initTasks(onSuccess, taskId, wfInstanceId)
-    } else {
-    }
+    const { onSuccess, onFailure, taskId, wfInstanceId } = jobData.data
+    this.logger.debug(`Init: ${JSON.stringify({ data: jobData.data }, null, 2)}`)
+
+    const nextTasks = jobData.succeed ? onSuccess : onFailure
+
+    const a = await this.wfmsService.initTasks(nextTasks, taskId, wfInstanceId)
   }
 }

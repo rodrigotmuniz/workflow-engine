@@ -3,6 +3,7 @@ import { DefinitionsClientService } from 'src/definitions-client/definitions-cli
 import { TaskExecutionsClientService } from 'src/states-client/task-executions-client/task-executions-client.service'
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
 import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
+import { TaskExecution } from '../../commons/entities/task-execution.entity'
 
 @Injectable()
 export class WfmsService {
@@ -43,14 +44,43 @@ export class WfmsService {
   async initTasks(initTaskIds: string[], fromTaskId: string, wfInstanceId: number) {
     this.logger.log(`initTasks: ${JSON.stringify({ initTaskIds, fromTaskId, wfInstanceId }, null, 2)}`)
 
-    // const initTaskId = initTaskIds[0] // ! TODO: Passar para array a chamada abaixo
-    // const taskExecution = await this.taskExecutionsClientService.findOneByTaskIdAndWfInstanceId(initTaskId, wfInstanceId)
+    const updatedTaskExecutions = await this.taskExecutionsClientService.removeDependencyByIds(initTaskIds, wfInstanceId, fromTaskId)
+    this.logger.debug(`updatedTasks: ${JSON.stringify(updatedTaskExecutions, null, 2)}`)
 
-    // this.logger.debug(`taskExecution: ${JSON.stringify(taskExecution, null, 2)}`)
-
-    const removed = await this.taskExecutionsClientService.removeDependencyByIds(initTaskIds, wfInstanceId, fromTaskId)
+    for (let updatedTaskExecution of updatedTaskExecutions) {
+      this.initTask(updatedTaskExecution)
+    }
     // const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id, fromTaskId)
-    this.logger.debug(`removed: ${JSON.stringify(removed, null, 2)}`)
-    return removed
+    return updatedTaskExecutions
   }
+
+  private initTask(taskExecution: TaskExecution) {
+    this.logger.log(`initTask: ${JSON.stringify({taskExecution }, null, 2)}`)
+
+    if (taskExecution.dependencies.length) {
+      // criar evento e bla
+      console.log()
+    } else {
+      this.taskQueuesClientService.emitEvent(taskExecution.taskId, taskExecution)
+    }
+  }
+
+  // {
+  //   "id": 672,
+  //   "definitionId": "order_processing",
+  //   "status": "PENDING",
+  //   "wf_instance_id": 125,
+  //   "dependencies": [],
+  //   "taskId": "B",
+  //   "taskType": "database_query",
+  //   "taskService": "inventory-service",
+  //   "taskAction": "check_stock",
+  //   "taskRetry": 2,
+  //   "taskTimeout": 3000,
+  //   "onFailure": "E",
+  //   "onSuccess": "C,D",
+  //   "input": null,
+  //   "output": null
+  // }
+ 
 }

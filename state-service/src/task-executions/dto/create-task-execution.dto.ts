@@ -1,5 +1,7 @@
 import { IsArray, IsEnum, IsJSON, IsNumber, IsOptional, IsString } from 'class-validator'
 import { Status } from '../enums/status.enum'
+import { Expose, Transform } from 'class-transformer'
+import { Query, ParseArrayPipe } from '@nestjs/common'
 
 export class CreateTaskExecutionDto {
   @IsString()
@@ -13,6 +15,7 @@ export class CreateTaskExecutionDto {
 
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value)) // ! TODO: passar para um transform
   dependencies: string[]
 
   @IsString()
@@ -37,12 +40,12 @@ export class CreateTaskExecutionDto {
 
   @IsArray()
   @IsString({ each: true })
-  // @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value))
   onFailure: string[]
 
   @IsArray()
   @IsString({ each: true })
-  // @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value))
   onSuccess: string[]
 
   @IsJSON()
