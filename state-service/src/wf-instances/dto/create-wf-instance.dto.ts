@@ -8,7 +8,6 @@ export class CreateWfInstanceDto {
 
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value))
   currentStates: string[]
 
   @IsEnum(Status)

@@ -50,11 +50,11 @@ export class TaskExecutionsService {
   // }
 
   async updateStatus(id: number, status: Status) {
-    this.logger.log(`updateStatus(): ${JSON.stringify({id, status}, null, 2)}`)
+    this.logger.log(`updateStatus(): ${JSON.stringify({ id, status }, null, 2)}`)
 
     const updatedTaskExecution = await this.repository.update({ id }, { status })
 
-    this.logger.debug(`updatedTaskExecution: ${JSON.stringify({updatedTaskExecution}, null, 2)}`)
+    this.logger.debug(`updatedTaskExecution: ${JSON.stringify({ updatedTaskExecution }, null, 2)}`)
     return updatedTaskExecution
   }
 
@@ -90,6 +90,8 @@ export class TaskExecutionsService {
     try {
       this.logger.log(`removeDependencyByIds: ${JSON.stringify({ taskIds, wfInstanceId, dependencyId }, null, 2)}`)
 
+      if (!taskIds.length) return []
+
       const result = await this.repository
         .createQueryBuilder()
         .update(TaskExecution)
@@ -105,7 +107,7 @@ export class TaskExecutionsService {
         .execute()
 
       this.logger.debug(`result: ${JSON.stringify({ result }, null, 2)}`)
-      const updatedExecution = plainToClass(CreateTaskExecutionDto, result.raw)
+      const updatedExecution = result.raw
       return updatedExecution
     } catch (error) {
       const errorMessage = `removeDependencyByIds: ${JSON.stringify({ error }, null, 2)}`

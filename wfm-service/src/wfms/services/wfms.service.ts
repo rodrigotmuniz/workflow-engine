@@ -23,6 +23,11 @@ export class WfmsService {
     const taskExecutions = await this.creteInitialState(definitionId)
     const initialExecutions = this.getInitialExecutions(taskExecutions)
 
+    await this.wfInstancesClientService.updateState({
+      id: initialExecutions[0].wfInstanceId,
+      status: Status.IN_PROGRESS,
+    })
+
     this.initialInitTasks(initialExecutions)
 
     return { message: 'Initial events emitted.' }
@@ -57,6 +62,8 @@ export class WfmsService {
   }
 
   async initialInitTasks(initialExecutions: TaskExecution[]) {
+    this.logger.log(`initialInitTasks: ${JSON.stringify({ initialExecutions }, null, 2)}`)
+
     for (let initialExecution of initialExecutions) {
       this.initTask(initialExecution)
     }
@@ -98,5 +105,12 @@ export class WfmsService {
       taskId: taskExecution.taskId,
       type: CurrentStatusType.REMOVE,
     })
+
+    if (!taskExecution.onSuccess.length && !taskExecution.onFailure.length) {
+      await this.wfInstancesClientService.updateState({
+        id: taskExecution.wfInstanceId,
+        status: Status.SUCCEEDED,
+      })
+    }
   }
 }

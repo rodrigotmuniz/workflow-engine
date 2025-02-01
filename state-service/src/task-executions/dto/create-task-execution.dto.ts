@@ -15,7 +15,6 @@ export class CreateTaskExecutionDto {
 
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value)) // ! TODO: passar para um transform
   dependencies: string[]
 
   @IsString()
@@ -40,12 +39,10 @@ export class CreateTaskExecutionDto {
 
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value))
   onFailure: string[]
 
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value))
   onSuccess: string[]
 
   @IsJSON()

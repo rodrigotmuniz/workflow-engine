@@ -15,6 +15,6 @@ export class TaskQueuesProcessor {
 
     setTimeout(() => {
       this.eventEmitterService.emitWfmQueueEvent(job.name, { data: job.data, success: true })
-    }, 1000)
+    }, 0)
   }
 }

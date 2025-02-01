@@ -37,10 +37,10 @@ export class TaskExecution {
   @Column({ nullable: true })
   taskTimeout: number
 
-  @Column('simple-array', { default: [] })
+  @Column("text", { array: true })
   onFailure: string[]
 
-  @Column('simple-array', { default: [] })
+  @Column("text", { array: true })
   onSuccess: string[]
 
   @Column({ type: 'jsonb', nullable: true })
