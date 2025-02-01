@@ -11,9 +11,9 @@ export class WfmsController {
   constructor(private readonly wfmsService: WfmsService) {}
 
   @MessagePattern('[PATTERN]wfm.run')
-  run(@Payload() runInWfmDto: RunInWfmDto) {
-    this.logger.log(`run(): ${JSON.stringify(runInWfmDto, null, 2)}`)
+  run(@Payload() { definitionId }: { definitionId: string }) {
+    this.logger.log(`run(): ${JSON.stringify(definitionId, null, 2)}`)
 
-    return this.wfmsService.run(runInWfmDto)
+    return this.wfmsService.run(definitionId)
   }
 }

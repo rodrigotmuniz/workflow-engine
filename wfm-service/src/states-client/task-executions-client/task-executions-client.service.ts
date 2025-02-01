@@ -16,13 +16,13 @@ export class TaskExecutionsClientService {
 
   async create(createTaskExecutionDto: CreateTaskExecutionDto) {
     const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.create', createTaskExecutionDto)
-    const data = await firstValueFrom<{ data: boolean }>(observable)
+    const { data } = await firstValueFrom<{ data: any }>(observable)
     return data
   }
 
   async createMany(createTaskExecutionDtos: CreateTaskExecutionDto[]) {
     const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.createMany', createTaskExecutionDtos)
-    const data = await firstValueFrom<{ data: boolean }>(observable)
+    const { data } = await firstValueFrom<{ data: any }>(observable)
     return data
   }
 
@@ -42,7 +42,7 @@ export class TaskExecutionsClientService {
         dependencies: [],
         onFailure: [],
         onSuccess: [],
-        status: Status.PENDING
+        status: Status.PENDING,
       }
       for (let transition of definition.transitions) {
         const { from, to, onFailure, onSuccess } = transition

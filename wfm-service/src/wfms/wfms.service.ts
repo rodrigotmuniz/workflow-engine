@@ -2,7 +2,8 @@ import { Injectable, Logger } from '@nestjs/common'
 import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
 import { TaskExecutionsClientService } from 'src/states-client/task-executions-client/task-executions-client.service'
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
-import { RunInWfmDto } from './dto/run-in-wfm.dto'
+import { EventEmitterService } from './services/event-emitter.service'
+import { TaskEventEmitter } from './services/task-event-emitter.service'
 
 @Injectable()
 export class WfmsService {
@@ -11,19 +12,35 @@ export class WfmsService {
     private readonly definitionsClientService: DefinitionsClientService,
     private readonly wfInstancesClientService: WfInstancesClientService,
     private readonly taskExecutionsClientService: TaskExecutionsClientService,
+    private readonly taskQueuesService: EventEmitterService,
+    private readonly taskEventEmitter: TaskEventEmitter,
   ) {}
 
-  async run(runInWfmDto: RunInWfmDto) {
+  async run(definitionId: string) {
     this.logger.log('run()')
 
-    const definition = await this.definitionsClientService.findJsonDefinitionByName(runInWfmDto.name)
+    // this.taskEventEmitter.onTaskCompleted('bla', 'ble', (data) => console.log(1111111111, data))
+
+    const taskExecutions = await this.creteInitialState(definitionId)
+    const initialExecutions = this.getInitialExecutions(taskExecutions)
+    // const queue = await this.taskQueuesService.find()
+
+    const tasksPromises = initialExecutions.map((execution) => this.taskQueuesService.emitEvent(execution.taskId, execution))
+    const response = await Promise.all(tasksPromises)
+
+    return { response, initialExecutions }
+    // return queue
+  }
+
+  private async creteInitialState(definitionId: string) {
+    const definition = await this.definitionsClientService.findJsonDefinitionByName(definitionId)
     const wfInstance = await this.wfInstancesClientService.createByDefinition(definition)
     const taskExecutions = await this.taskExecutionsClientService.createDefinitionsTask(definition, wfInstance.id)
-
-    // - [ ]  Validate: [TASK_QUEUE]
-    // - [ ]  all task executors exists [TASK_QUEUE]
-    // - [ ]  task executors' dto are mapped [TASK_QUEUE]
-
     return taskExecutions
+  }
+
+  private getInitialExecutions(taskExecutions) {
+    const initialExecutions = taskExecutions.filter((execution) => !execution.dependencies.length)
+    return initialExecutions
   }
 }

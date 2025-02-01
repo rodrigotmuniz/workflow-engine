@@ -6,7 +6,7 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 async function bootstrap() {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(AppModule, {
     transport: Transport.REDIS,
-    options: { host: 'localhost', port: 6379 },
+    options: { host: 'localhost', port: 6000 },
     logger: new ConsoleLogger({
       prefix: 'Task Queue Service',
       json: Boolean(process.env.JSON_LOG || false),
