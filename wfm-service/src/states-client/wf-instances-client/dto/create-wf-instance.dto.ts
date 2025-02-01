@@ -1,5 +1,5 @@
 import { IsArray, IsEnum, IsString } from 'class-validator'
-import { Status } from '../enums/status.enum'
+import { Status } from 'src/states-client/enums/status.enum'
 
 export class CreateWfInstanceDto {
   @IsString()

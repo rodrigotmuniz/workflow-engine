@@ -3,7 +3,8 @@ import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { CreateWfInstanceDto } from './dto/create-wf-instance.dto'
 import { WorkflowDefinitionDto } from 'src/definitions-client/dto/wf-definition.dto'
-import { Status } from './enums/status.enum'
+import { Status } from '../enums/status.enum'
+import { WfInstance } from './entities/wf-instance.entity'
 
 @Injectable()
 export class WfInstancesClientService {
@@ -16,7 +17,7 @@ export class WfInstancesClientService {
 
   async create(createWfInstanceDto: CreateWfInstanceDto) {
     const observable = this.clientProxy.send('[PATTERN]WfInstancesController.create', createWfInstanceDto)
-    const data = await firstValueFrom<{ data: boolean }>(observable)
+    const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
     return data
   }
 

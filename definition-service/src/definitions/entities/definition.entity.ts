@@ -8,6 +8,8 @@ export class Definition {
   @Column({ unique: true })
   name: string
 
+  // ! TODO: Adicionar version
+
   @Column({ type: 'jsonb' })
   definition: object
 }

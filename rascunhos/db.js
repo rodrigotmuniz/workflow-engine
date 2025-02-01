@@ -35,18 +35,19 @@ const a = {
       definitionId: string,
       workflowInstanceId: number,
 
-      dependencies: [string],
-      // toTaskId: [string], // names} onFailure or onSuccess
+      
+      // taskId: string,
+      // taskType: string,
+      // taskService: string,
+      // taskAction: string,
+      // taskRetry: number,
+      // taskTimeout: number,
+      
+      // onFailure: [string], // taskName
+      // onSuccess: [string], // taskName
 
-      taskId: string,
-      taskType: string,
-      taskService: string,
-      taskAction: string,
-      taskRetry: number,
-      taskTimeout: number,
-
-      onFailure: [string], // taskName
-      onSuccess: [string], // taskName
+      // onSuccessDependencies: [string],
+      // onFailureDependencies: [string],
 
       input: {},
       output: {},
@@ -81,3 +82,11 @@ const eventResponse = {
 
   output: {}
 }
+
+const transitions = [
+    { "from": ["A"], "to": ["B"], "onSuccess": true },
+    { "from": ["B"], "to": ["C", "E"], "onSuccess": true },
+    { "from": ["B"], "to": ["G"], "onFailure": true },
+    { "from": ["C", "E"], "to": ["D"], "onSuccess": true },
+    { "from": ["D"], "to": ["F"], "onSuccess": true }
+  ]

@@ -62,7 +62,7 @@ class TransitionDto {
 
   @IsArray()
   @IsString({ each: true })
-  to: string[];
+  to: string[]
 
   @IsBoolean()
   @IsOptional()

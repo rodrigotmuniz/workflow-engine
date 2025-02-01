@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ClientsModule } from '@nestjs/microservices'
 import { WfInstancesClientService } from './wf-instances-client/wf-instances-client.service'
+import { TaskExecutionsClientService } from './task-executions-client/task-executions-client.service'
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { WfInstancesClientService } from './wf-instances-client/wf-instances-cli
       },
     ]),
   ],
-  providers: [WfInstancesClientService],
-  exports: [WfInstancesClientService],
+  providers: [WfInstancesClientService, TaskExecutionsClientService],
+  exports: [WfInstancesClientService, TaskExecutionsClientService],
 })
 export class StatesClientModule {}

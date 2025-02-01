@@ -1,4 +1,4 @@
-import { Status } from '../enums/status.enum'
+import { Status } from 'src/states-client/enums/status.enum'
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
 
 @Entity('wf_instances')

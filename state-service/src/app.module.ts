@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { WfInstancesModule } from './wf-instances/wf-instances.module'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigModule } from '@nestjs/config'
+import { TaskExecutionsModule } from './task-executions/task-executions.module'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { ConfigModule } from '@nestjs/config'
       synchronize: Boolean(process.env.STATES_DB_SYNCHRONIZE),
     }),
     WfInstancesModule,
+    TaskExecutionsModule,
   ],
 })
 export class AppModule {}

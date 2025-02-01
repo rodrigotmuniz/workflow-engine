@@ -72,15 +72,16 @@
     }
   ],
   "transitions": [
-    { "from": "validate_order", "to": "check_inventory", "onSuccess": true },
-    { "from": "check_inventory", "to": ["process_payment", "test"], "onSuccess": true },
-    { "from": "check_inventory", "to": "cancel_order", "onFailure": true },
-    { "from": ["process_payment", "test"], "to": "update_inventory", "onSuccess": true },
-    { "from": "process_payment", "to": "notify_failure", "onFailure": true },
-    { "from": "update_inventory", "to": "send_confirmation_email", "onSuccess": true },
-    { "from": "update_inventory", "to": "refund_payment", "onFailure": true },
-    { "from": "refund_payment", "to": "restock_inventory", "onSuccess": true },
-    { "from": "refund_payment", "to": "notify_failure", "onFailure": true }
+    { "from": ["validate_order"], "to": ["check_inventory"], "onSuccess": true },
+    { "from": ["check_inventory"], "to": ["process_payment", "test"], "onSuccess": true },
+    { "from": ["check_inventory", "test"], "to": ["cancel_order"], "onFailure": true },
+    { "from": ["process_payment", "test"], "to": ["update_inventory"], "onSuccess": true },
+    { "from": ["process_payment"], "to": ["notify_failure"], "onFailure": true },
+    { "from": ["update_inventory"], "to": ["send_confirmation_email"], "onSuccess": true },
+    { "from": ["update_inventory"], "to": ["refund_payment"], "onFailure": true },
+    { "from": ["refund_payment"], "to": ["restock_inventory"], "onSuccess": true },
+    { "from": ["refund_payment"], "to": ["notify_failure"], "onFailure": true }
   ]
 }
+
 

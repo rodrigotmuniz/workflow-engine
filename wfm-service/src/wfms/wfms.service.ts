@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
-import { RunInWfmDto } from './dto/run-in-wfm.dto'
+import { TaskExecutionsClientService } from 'src/states-client/task-executions-client/task-executions-client.service'
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
-import { Status } from 'src/states-client/wf-instances-client/enums/status.enum'
+import { RunInWfmDto } from './dto/run-in-wfm.dto'
 
 @Injectable()
 export class WfmsService {
@@ -10,6 +10,7 @@ export class WfmsService {
   constructor(
     private readonly definitionsClientService: DefinitionsClientService,
     private readonly wfInstancesClientService: WfInstancesClientService,
+    private readonly taskExecutionsClientService: TaskExecutionsClientService,
   ) {}
 
   async run(runInWfmDto: RunInWfmDto) {
@@ -17,11 +18,12 @@ export class WfmsService {
 
     const definition = await this.definitionsClientService.findJsonDefinitionByName(runInWfmDto.name)
     const wfInstance = await this.wfInstancesClientService.createByDefinition(definition)
+    const taskExecutions = await this.taskExecutionsClientService.createDefinitionsTask(definition, wfInstance.id)
 
     // - [ ]  Validate: [TASK_QUEUE]
     // - [ ]  all task executors exists [TASK_QUEUE]
     // - [ ]  task executors' dto are mapped [TASK_QUEUE]
 
-    return wfInstance
+    return taskExecutions
   }
 }
