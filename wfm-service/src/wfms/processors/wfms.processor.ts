@@ -1,7 +1,7 @@
 import { Process, Processor } from '@nestjs/bull'
-import { Job } from 'bull'
-import { WfmsService } from './wfms.service'
 import { Logger } from '@nestjs/common'
+import { Job } from 'bull'
+import { WfmsService } from '../services/wfms.service'
 
 @Processor(process.env.WFM_QUEUE || 'WFM_QUEUE')
 export class WfmsProcessor {

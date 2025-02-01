@@ -1,8 +1,6 @@
 import { Controller, Logger } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
-import { RunInWfmDto } from './dto/run-in-wfm.dto'
-import { UpdateWfmDto } from './dto/update-wfm.dto'
-import { WfmsService } from './wfms.service'
+import { WfmsService } from './services/wfms.service'
 
 @Controller()
 export class WfmsController {
@@ -11,9 +9,10 @@ export class WfmsController {
   constructor(private readonly wfmsService: WfmsService) {}
 
   @MessagePattern('[PATTERN]wfm.run')
-  run(@Payload() { definitionId }: { definitionId: string }) {
-    this.logger.log(`run(): ${JSON.stringify(definitionId, null, 2)}`)
+  run(@Payload() payload: { definitionId: string }) {
+    this.logger.log(`run: ${JSON.stringify(payload, null, 2)}`)
 
+    const { definitionId } = payload
     return this.wfmsService.run(definitionId)
   }
 }

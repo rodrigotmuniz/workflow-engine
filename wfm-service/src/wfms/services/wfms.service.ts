@@ -2,8 +2,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
 import { TaskExecutionsClientService } from 'src/states-client/task-executions-client/task-executions-client.service'
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
-import { EventEmitterService } from './services/event-emitter.service'
-import { TaskEventEmitter } from './services/task-event-emitter.service'
+import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
 
 @Injectable()
 export class WfmsService {
@@ -12,24 +11,17 @@ export class WfmsService {
     private readonly definitionsClientService: DefinitionsClientService,
     private readonly wfInstancesClientService: WfInstancesClientService,
     private readonly taskExecutionsClientService: TaskExecutionsClientService,
-    private readonly taskQueuesService: EventEmitterService,
-    private readonly taskEventEmitter: TaskEventEmitter,
+    private readonly taskQueuesClientService: TaskQueuesClientService,
   ) {}
 
   async run(definitionId: string) {
     this.logger.log(`run: ${JSON.stringify({ definitionId }, null, 2)}`)
 
-    // this.taskEventEmitter.onTaskCompleted('bla', 'ble', (data) => console.log(1111111111, data))
-
     const taskExecutions = await this.creteInitialState(definitionId)
     const initialExecutions = this.getInitialExecutions(taskExecutions)
-    // const queue = await this.taskQueuesService.find()
+    await this.taskQueuesClientService.emitEvents(initialExecutions)
 
-    const tasksPromises = initialExecutions.map((execution) => this.taskQueuesService.emitEvent(execution.taskId, execution))
-    const response = await Promise.all(tasksPromises)
-
-    return { response, initialExecutions }
-    // return queue
+    return { message: 'Initial events emitted.' }
   }
 
   private async creteInitialState(definitionId: string) {
@@ -56,7 +48,7 @@ export class WfmsService {
 
     this.logger.debug(`taskExecution: ${JSON.stringify(taskExecution, null, 2)}`)
 
-    const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id,fromTaskId)
+    const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id, fromTaskId)
     return removed
   }
 }
