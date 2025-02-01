@@ -1,12 +1,16 @@
 import { Process, Processor } from '@nestjs/bull'
 import { Job } from 'bull'
 import { WfmsService } from './wfms.service'
+import { Logger } from '@nestjs/common'
 
 @Processor(process.env.WFM_QUEUE || 'WFM_QUEUE')
 export class WfmsProcessor {
+  private readonly logger = new Logger(WfmsProcessor.name)
+
   constructor(private readonly wfmsService: WfmsService) {}
   @Process('*')
   async handleTask(job: Job) {
+    this.logger.log(`emitWfmQueueEvent: ${JSON.stringify({ name: job.name, data: job.data }, null, 2)} | [PID ${process.pid}]`)
     //   {
     //     definitionId: 'order_processing',
     //     status: 'PENDING',
@@ -30,13 +34,9 @@ export class WfmsProcessor {
     const jobData = job.data
     if (jobData.succeed) {
       const { onSuccess, taskId, wfInstanceId } = jobData.data
-      console.log(`Init: ${onSuccess} | ${taskId}}`)
+      this.logger.debug(`Init: ${onSuccess} | ${taskId}}`)
       const a = await this.wfmsService.initTasks(onSuccess, taskId, wfInstanceId)
     } else {
     }
-    // setTimeout(() => {
-
-    console.log(`Server WFM_QUEUE_QUEUE [PID ${process.pid}]: Processing task ->`, job.name, job.data, await job.getState())
-    // }, 5000);
   }
 }

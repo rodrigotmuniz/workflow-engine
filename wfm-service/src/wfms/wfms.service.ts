@@ -17,7 +17,7 @@ export class WfmsService {
   ) {}
 
   async run(definitionId: string) {
-    this.logger.log('run()')
+    this.logger.log(`run: ${JSON.stringify({ definitionId }, null, 2)}`)
 
     // this.taskEventEmitter.onTaskCompleted('bla', 'ble', (data) => console.log(1111111111, data))
 
@@ -33,6 +33,8 @@ export class WfmsService {
   }
 
   private async creteInitialState(definitionId: string) {
+    this.logger.log(`creteInitialState: ${JSON.stringify({ definitionId }, null, 2)}`)
+
     const definition = await this.definitionsClientService.findJsonDefinitionByName(definitionId)
     const wfInstance = await this.wfInstancesClientService.createByDefinition(definition)
     const taskExecutions = await this.taskExecutionsClientService.createDefinitionsTask(definition, wfInstance.id)
@@ -40,6 +42,8 @@ export class WfmsService {
   }
 
   private getInitialExecutions(taskExecutions) {
+    this.logger.log(`getInitialExecutions: ${JSON.stringify({ taskExecutions }, null, 2)}`)
+
     const initialExecutions = taskExecutions.filter((execution) => !execution.dependencies.length)
     return initialExecutions
   }

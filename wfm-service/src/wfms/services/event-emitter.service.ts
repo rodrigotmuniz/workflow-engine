@@ -9,20 +9,11 @@ export class EventEmitterService {
   constructor(
     @InjectQueue(process.env.TASK_QUEUE || 'TASK_QUEUE')
     private taskQueue: Queue,
-
-    // @InjectQueue(process.env.TASK_QUEUE || 'TASK_QUEUE')
-    // private taskQueue: Queue,
   ) {}
 
   async emitEvent(eventType: string, payload: any) {
-    console.log(`🔹 Emitting dynamic event: ${eventType}`, payload)
+    this.logger.log(`emitEvent: ${JSON.stringify({ eventType, payload }, null, 2)}`)
+
     await this.taskQueue.add(eventType, payload, { removeOnComplete: true })
   }
-
-  // async find() {
-  //   this.logger.log('findAll()')
-  //   console.log('Server A: Adding job to queue')
-  //   await this.taskQueue.add('process_task', { message: 'Task from Server WFM' })
-  //   return {}
-  // }
 }
