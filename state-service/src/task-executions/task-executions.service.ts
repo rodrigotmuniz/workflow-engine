@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { In, QueryFailedError, Repository } from 'typeorm'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
 import { TaskExecution } from './entities/task-execution.entity'
 
@@ -40,21 +40,52 @@ export class TaskExecutionsService {
     return this.repository.findOneBy({ taskId, wfInstanceId })
   }
 
-  async removeDependency(id: number, taskId: string) {
-    this.logger.log(`removeDependency: ${JSON.stringify({ id, taskId }, null, 2)}`)
+  async removeDependency(id: number, dependencyId: string) {
+    this.logger.log(`removeDependency: ${JSON.stringify({ id, dependencyId }, null, 2)}`)
+
     try {
-      let result = await this.repository
+      const result = await this.repository
         .createQueryBuilder()
         .update(TaskExecution)
         .set({
-          dependencies: () => `array_remove(dependencies, '${taskId}')`,
+          dependencies: () => `array_remove(dependencies, '${dependencyId}')`,
         })
         .where('id = :id', { id })
+        .returning('*')
         .execute()
-      console.log(2222, JSON.stringify(result, null, 2))
-      return result
-    } catch (erro) {
-      console.log(4444, erro)
+
+      const updatedExecution = result.raw[0]
+      return updatedExecution
+    } catch (error) {
+      const errorMessage = `removeDependency: ${JSON.stringify({ error }, null, 2)}`
+      this.logger.log(errorMessage)
+
+      throw new Error(errorMessage) // ! TODO: Improve it
+    }
+  }
+
+  async removeDependencyByIds(taskIds: string[], wfInstanceId: number, dependencyId: string) {
+    try {
+      this.logger.log(`removeDependency: ${JSON.stringify({ taskIds, dependencyId }, null, 2)}`)
+
+      const result = await this.repository
+        .createQueryBuilder()
+        .update(TaskExecution)
+        .set({
+          dependencies: () => `array_remove(dependencies, '${dependencyId}')`,
+        })
+        .where('taskId IN (:...taskIds) AND wfInstanceId = :wfInstanceId', { taskIds, wfInstanceId })
+        .returning('*')
+        .execute()
+
+      this.logger.debug(`result: ${JSON.stringify({ result }, null, 2)}`)
+      const updatedExecution = result.raw[0]
+      return updatedExecution
+    } catch (error) {
+      const errorMessage = `removeDependency: ${JSON.stringify({ error }, null, 2)}`
+      this.logger.error(errorMessage)
+
+      throw new Error(errorMessage) // ! TODO: Improve it
     }
   }
 }

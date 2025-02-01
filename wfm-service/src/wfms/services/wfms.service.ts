@@ -40,15 +40,17 @@ export class WfmsService {
     return initialExecutions
   }
 
-  async initTasks(initTaskIds: number, fromTaskId: string, wfInstanceId: number) {
+  async initTasks(initTaskIds: string[], fromTaskId: string, wfInstanceId: number) {
     this.logger.log(`initTasks: ${JSON.stringify({ initTaskIds, fromTaskId, wfInstanceId }, null, 2)}`)
 
-    const initTaskId = initTaskIds[0] // ! TODO: Passar para array a chamada abaixo
-    const taskExecution = await this.taskExecutionsClientService.findOneByTaskIdAndWfInstanceId(initTaskId, wfInstanceId)
+    // const initTaskId = initTaskIds[0] // ! TODO: Passar para array a chamada abaixo
+    // const taskExecution = await this.taskExecutionsClientService.findOneByTaskIdAndWfInstanceId(initTaskId, wfInstanceId)
 
-    this.logger.debug(`taskExecution: ${JSON.stringify(taskExecution, null, 2)}`)
+    // this.logger.debug(`taskExecution: ${JSON.stringify(taskExecution, null, 2)}`)
 
-    const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id, fromTaskId)
+    const removed = await this.taskExecutionsClientService.removeDependencyByIds(initTaskIds, wfInstanceId, fromTaskId)
+    // const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id, fromTaskId)
+    this.logger.debug(`removed: ${JSON.stringify(removed, null, 2)}`)
     return removed
   }
 }

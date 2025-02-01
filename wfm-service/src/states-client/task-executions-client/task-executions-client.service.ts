@@ -34,6 +34,14 @@ export class TaskExecutionsClientService {
     return data
   }
 
+  async removeDependencyByIds(taskIds: string[], wfInstanceId: number, dependencyId: string) {
+    this.logger.log(`removeDependencyByIds: ${JSON.stringify({ taskIds, wfInstanceId, dependencyId }, null, 2)}`)
+
+    const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.removeDependencyByIds', { taskIds, wfInstanceId, dependencyId })
+    const { data } = await firstValueFrom<{ data: any }>(observable)
+    return data
+  }
+
   async create(createTaskExecutionDto: CreateTaskExecutionDto) {
     const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.create', createTaskExecutionDto)
     const { data } = await firstValueFrom<{ data: any }>(observable)

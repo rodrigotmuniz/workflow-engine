@@ -42,4 +42,12 @@ export class TaskExecutionsController {
     const { wfInstanceId, taskId } = payload
     return this.taskExecutionsService.findOneByTaskIdAndWfInstanceId(taskId, wfInstanceId)
   }
+
+  @MessagePattern('[PATTERN]TaskExecutionsController.removeDependencyByIds')
+  removeDependencyByIds(@Payload() payload: { taskIds: string[]; wfInstanceId: number; dependencyId: string }) {
+    this.logger.log(`removeDependencyByIds: ${JSON.stringify(payload, null, 2)}`)
+
+    const { taskIds, wfInstanceId, dependencyId } = payload
+    return this.taskExecutionsService.removeDependencyByIds(taskIds, wfInstanceId, dependencyId)
+  }
 }
