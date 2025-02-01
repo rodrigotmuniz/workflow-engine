@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 import { Status } from '../enums/status.enum'
 import { Expose } from 'class-transformer'
 
@@ -14,8 +14,6 @@ export class TaskExecution {
   status: Status
 
   @Column()
-  // @Column({name: 'wf_instance_id'})
-  // @Expose({ name: 'wfInstanceId' })
   wfInstanceId: number
 
   @Column("text", { array: true })
@@ -50,4 +48,10 @@ export class TaskExecution {
 
   @Column({ type: 'jsonb', nullable: true })
   output: object
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
 }

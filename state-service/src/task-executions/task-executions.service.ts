@@ -4,6 +4,8 @@ import { In, QueryFailedError, Repository } from 'typeorm'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
 import { TaskExecution } from './entities/task-execution.entity'
 import { plainToClass } from 'class-transformer'
+import { Status } from './enums/status.enum'
+import { UpdateTaskExecutionDto } from './dto/update-task-execution.dto'
 
 @Injectable()
 export class TaskExecutionsService {
@@ -37,13 +39,32 @@ export class TaskExecutionsService {
   async findById(id: number) {
     return this.repository.findOneBy({ id })
   }
+
+  // async updateStatus(taskId: string, wfInstanceId: number, status: Status) {
+  //   this.logger.log(`updateStatus(): ${JSON.stringify({taskId, wfInstanceId, status}, null, 2)}`)
+
+  //   const updatedTaskExecution = await this.repository.update({ taskId, wfInstanceId }, { status })
+
+  //   this.logger.debug(`updatedTaskExecution: ${JSON.stringify({updatedTaskExecution}, null, 2)}`)
+  //   return updatedTaskExecution
+  // }
+
+  async updateStatus(id: number, status: Status) {
+    this.logger.log(`updateStatus(): ${JSON.stringify({id, status}, null, 2)}`)
+
+    const updatedTaskExecution = await this.repository.update({ id }, { status })
+
+    this.logger.debug(`updatedTaskExecution: ${JSON.stringify({updatedTaskExecution}, null, 2)}`)
+    return updatedTaskExecution
+  }
+
   async findOneByTaskIdAndWfInstanceId(taskId: string, wfInstanceId: number) {
     return this.repository.findOneBy({ taskId, wfInstanceId })
   }
 
   async removeDependency(id: number, dependencyId: string) {
     try {
-    this.logger.log(`removeDependency: ${JSON.stringify({ id, dependencyId }, null, 2)}`)
+      this.logger.log(`removeDependency: ${JSON.stringify({ id, dependencyId }, null, 2)}`)
 
       const result = await this.repository
         .createQueryBuilder()
@@ -83,11 +104,8 @@ export class TaskExecutionsService {
         .returning('*')
         .execute()
 
-        
-
       this.logger.debug(`result: ${JSON.stringify({ result }, null, 2)}`)
-      const updatedExecution = plainToClass(CreateTaskExecutionDto, result.raw);
-      this.logger.debug(`updatedExecution: ${JSON.stringify({ updatedExecution }, null, 2)}`)
+      const updatedExecution = plainToClass(CreateTaskExecutionDto, result.raw)
       return updatedExecution
     } catch (error) {
       const errorMessage = `removeDependencyByIds: ${JSON.stringify({ error }, null, 2)}`

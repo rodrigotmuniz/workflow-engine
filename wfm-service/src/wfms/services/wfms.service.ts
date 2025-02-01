@@ -4,6 +4,7 @@ import { TaskExecutionsClientService } from 'src/states-client/task-executions-c
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
 import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
 import { TaskExecution } from '../../commons/entities/task-execution.entity'
+import { Status } from 'src/commons/enums/status.enum'
 
 @Injectable()
 export class WfmsService {
@@ -20,7 +21,9 @@ export class WfmsService {
 
     const taskExecutions = await this.creteInitialState(definitionId)
     const initialExecutions = this.getInitialExecutions(taskExecutions)
-    await this.taskQueuesClientService.emitEvents(initialExecutions)
+    // await this.taskQueuesClientService.emitEvents(initialExecutions)
+
+    this.initialInitTasks(initialExecutions)
 
     return { message: 'Initial events emitted.' }
   }
@@ -48,39 +51,28 @@ export class WfmsService {
     this.logger.debug(`updatedTasks: ${JSON.stringify(updatedTaskExecutions, null, 2)}`)
 
     for (let updatedTaskExecution of updatedTaskExecutions) {
-      this.initTask(updatedTaskExecution)
+      this.initTask(updatedTaskExecution) 
     }
     // const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id, fromTaskId)
     return updatedTaskExecutions
   }
 
-  private initTask(taskExecution: TaskExecution) {
-    this.logger.log(`initTask: ${JSON.stringify({taskExecution }, null, 2)}`)
-
-    if (taskExecution.dependencies.length) {
-      // criar evento e bla
-      console.log()
-    } else {
-      this.taskQueuesClientService.emitEvent(taskExecution.taskId, taskExecution)
+  async initialInitTasks(initialExecutions: TaskExecution[]) {
+    for (let initialExecution of initialExecutions) {
+      this.initTask(initialExecution) 
     }
   }
 
-  // {
-  //   "id": 672,
-  //   "definitionId": "order_processing",
-  //   "status": "PENDING",
-  //   "wf_instance_id": 125,
-  //   "dependencies": [],
-  //   "taskId": "B",
-  //   "taskType": "database_query",
-  //   "taskService": "inventory-service",
-  //   "taskAction": "check_stock",
-  //   "taskRetry": 2,
-  //   "taskTimeout": 3000,
-  //   "onFailure": "E",
-  //   "onSuccess": "C,D",
-  //   "input": null,
-  //   "output": null
-  // }
- 
+  private async initTask(taskExecution: TaskExecution) {
+    this.logger.log(`initTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
+
+    if (taskExecution.dependencies.length) {
+      console.log()
+    } else {
+      const updateStatus = await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.RUNNING })
+      this.logger.debug(`updateStatus: ${JSON.stringify({ updateStatus }, null, 2)}`)
+
+      this.taskQueuesClientService.emitEvent(taskExecution.taskId, taskExecution)
+    }
+  }
 }

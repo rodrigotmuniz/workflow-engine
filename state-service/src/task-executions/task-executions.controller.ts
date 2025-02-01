@@ -2,6 +2,7 @@ import { Controller, Logger } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
 import { TaskExecutionsService } from './task-executions.service'
+import { Status } from './enums/status.enum'
 
 @Controller()
 export class TaskExecutionsController {
@@ -50,4 +51,20 @@ export class TaskExecutionsController {
     const { taskIds, wfInstanceId, dependencyId } = payload
     return this.taskExecutionsService.removeDependencyByIds(taskIds, wfInstanceId, dependencyId)
   }
+
+  @MessagePattern('[PATTERN]TaskExecutionsController.updateStatus')
+  updateStatus(@Payload() payload: { id: number, status: Status }) {
+    this.logger.log(`updateStatus: ${JSON.stringify(payload, null, 2)}`)
+
+    const { id, status } = payload
+    return this.taskExecutionsService.updateStatus(id, status)
+  }
+
+  // @MessagePattern('[PATTERN]TaskExecutionsController.updateStatus')
+  // updateStatus(@Payload() payload: { taskId: string; wfInstanceId: number; status: Status }) {
+  //   this.logger.log(`updateStatus: ${JSON.stringify(payload, null, 2)}`)
+
+  //   const { taskId, wfInstanceId, status } = payload
+  //   return this.taskExecutionsService.updateStatus(taskId, wfInstanceId, status)
+  // }
 }
