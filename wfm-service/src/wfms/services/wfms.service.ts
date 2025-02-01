@@ -1,10 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { Status } from 'src/commons/enums/status.enum'
 import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
 import { TaskExecutionsClientService } from 'src/states-client/task-executions-client/task-executions-client.service'
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
-import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
 import { TaskExecution } from '../../commons/entities/task-execution.entity'
-import { Status } from 'src/commons/enums/status.enum'
+import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
+import { CurrentStatusType } from 'src/commons/enums/currentStatusType.enum'
 
 @Injectable()
 export class WfmsService {
@@ -21,7 +22,6 @@ export class WfmsService {
 
     const taskExecutions = await this.creteInitialState(definitionId)
     const initialExecutions = this.getInitialExecutions(taskExecutions)
-    // await this.taskQueuesClientService.emitEvents(initialExecutions)
 
     this.initialInitTasks(initialExecutions)
 
@@ -51,15 +51,14 @@ export class WfmsService {
     this.logger.debug(`updatedTasks: ${JSON.stringify(updatedTaskExecutions, null, 2)}`)
 
     for (let updatedTaskExecution of updatedTaskExecutions) {
-      this.initTask(updatedTaskExecution) 
+      this.initTask(updatedTaskExecution)
     }
-    // const removed = await this.taskExecutionsClientService.removeDependency(taskExecution.id, fromTaskId)
     return updatedTaskExecutions
   }
 
   async initialInitTasks(initialExecutions: TaskExecution[]) {
     for (let initialExecution of initialExecutions) {
-      this.initTask(initialExecution) 
+      this.initTask(initialExecution)
     }
   }
 
@@ -67,12 +66,37 @@ export class WfmsService {
     this.logger.log(`initTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
 
     if (taskExecution.dependencies.length) {
-      console.log()
+      await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.WAITING_FOR_DEPENDENCY })
     } else {
-      const updateStatus = await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.RUNNING })
+      const updateStatus = await this.taskExecutionsClientService.updateStatus({
+        id: taskExecution.id,
+        status: Status.IN_PROGRESS,
+      })
+
+      await this.wfInstancesClientService.updateCurrentState({
+        id: taskExecution.wfInstanceId,
+        taskId: taskExecution.taskId,
+        type: CurrentStatusType.APPEND,
+      })
+
       this.logger.debug(`updateStatus: ${JSON.stringify({ updateStatus }, null, 2)}`)
 
       this.taskQueuesClientService.emitEvent(taskExecution.taskId, taskExecution)
     }
+  }
+
+  async completeTask(taskExecution: TaskExecution, success: boolean) {
+    this.logger.log(`completeTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
+
+    await this.taskExecutionsClientService.updateStatus({
+      id: taskExecution.id,
+      status: success ? Status.SUCCEEDED : Status.FAILED,
+    })
+
+    await this.wfInstancesClientService.updateCurrentState({
+      id: taskExecution.wfInstanceId,
+      taskId: taskExecution.taskId,
+      type: CurrentStatusType.REMOVE,
+    })
   }
 }

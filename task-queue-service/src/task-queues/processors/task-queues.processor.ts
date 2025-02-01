@@ -1,7 +1,7 @@
 import { Process, Processor } from '@nestjs/bull'
+import { Logger } from '@nestjs/common'
 import { Job } from 'bull'
 import { EventEmitterService } from '../services/event-emitter.service'
-import { Logger } from '@nestjs/common'
 
 @Processor(process.env.TASK_QUEUE || 'TASK_QUEUE')
 export class TaskQueuesProcessor {
@@ -14,7 +14,7 @@ export class TaskQueuesProcessor {
     this.logger.log(`emitWfmQueueEvent: ${JSON.stringify({ name: job.name, data: job.data }, null, 2)} | [PID ${process.pid}]`)
 
     setTimeout(() => {
-      this.eventEmitterService.emitWfmQueueEvent(job.name, {data: job.data, succeed: true})
+      this.eventEmitterService.emitWfmQueueEvent(job.name, { data: job.data, success: true })
     }, 1000)
   }
 }

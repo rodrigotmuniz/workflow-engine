@@ -9,7 +9,7 @@ export class WfInstance {
   @Column()
   definitionId: string
 
-  @Column('simple-array')
+  @Column("text", { array: true })
   currentStates: string[]
 
   @Column({ type: 'enum', enum: Status })

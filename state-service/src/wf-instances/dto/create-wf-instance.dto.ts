@@ -1,5 +1,6 @@
 import { IsArray, IsEnum, IsString } from 'class-validator'
 import { Status } from '../enums/status.enum'
+import { Transform } from 'class-transformer'
 
 export class CreateWfInstanceDto {
   @IsString()
@@ -7,6 +8,7 @@ export class CreateWfInstanceDto {
 
   @IsArray()
   @IsString({ each: true })
+  @Transform(({ value }) => (typeof value === 'string' ? value.split(',') : value))
   currentStates: string[]
 
   @IsEnum(Status)

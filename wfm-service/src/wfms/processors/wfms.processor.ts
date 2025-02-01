@@ -2,6 +2,7 @@ import { Process, Processor } from '@nestjs/bull'
 import { Logger } from '@nestjs/common'
 import { Job } from 'bull'
 import { WfmsService } from '../services/wfms.service'
+import { TaskExecution } from 'src/commons/entities/task-execution.entity'
 
 @Processor(process.env.WFM_QUEUE || 'WFM_QUEUE')
 export class WfmsProcessor {
@@ -16,8 +17,9 @@ export class WfmsProcessor {
     const { onSuccess, onFailure, taskId, wfInstanceId } = jobData.data
     this.logger.debug(`Init: ${JSON.stringify({ data: jobData.data }, null, 2)}`)
 
-    const nextTasks = jobData.succeed ? onSuccess : onFailure
+    const nextTasks = jobData.success ? onSuccess : onFailure
 
+    await this.wfmsService.completeTask(jobData.data, jobData.success)
     const a = await this.wfmsService.initTasks(nextTasks, taskId, wfInstanceId)
   }
 }
