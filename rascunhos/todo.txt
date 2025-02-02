@@ -1,10 +1,11 @@
-- websocket
 - auth
+- test
 - libs with pattern and dto / entites
 - definition verification
 - docker
 - task executors / integration services / externals
 
 
+- websocket
 - try catchs
 - retries and timeouts

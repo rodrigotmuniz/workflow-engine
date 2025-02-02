@@ -18,4 +18,9 @@ export class WfmClientController {
     const payload: RunDto = { definitionName, body }
     return this.clientProxy.send('[PATTERN]wfm.run', payload)
   }
+
+  @Get()
+  bla() {
+    return this.clientProxy.send('AuthPattern.CREATE', {})
+  }
 }
