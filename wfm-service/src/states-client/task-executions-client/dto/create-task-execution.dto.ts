@@ -33,16 +33,18 @@ export class CreateTaskExecutionDto {
 
   @IsNumber()
   @IsOptional()
+  taskRetryInterval?: number
+
+  @IsNumber()
+  @IsOptional()
   taskTimeout?: number
 
   @IsArray()
   @IsString({ each: true })
-  // @IsOptional()
   onFailure: string[]
 
   @IsArray()
   @IsString({ each: true })
-  // @IsOptional()
   onSuccess: string[]
 
   @IsJSON()

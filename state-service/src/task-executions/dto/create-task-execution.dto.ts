@@ -35,6 +35,10 @@ export class CreateTaskExecutionDto {
 
   @IsNumber()
   @IsOptional()
+  taskRetryInterval?: number
+
+  @IsNumber()
+  @IsOptional()
   taskTimeout?: number
 
   @IsArray()

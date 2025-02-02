@@ -1,8 +1,9 @@
 import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 import { EventEmitterModule } from '@nestjs/event-emitter'
-import { TaskQueuesProcessor } from './processors/task-queues.processor'
+import { TaskQueuesProcessor } from './task-queues.processor'
 import { WfmsClientModule } from 'src/wfm-client/wfm-client.module'
+import { DlqsClientModule } from 'src/dlq-client/dlq-client.module'
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { WfmsClientModule } from 'src/wfm-client/wfm-client.module'
       },
     }),
     WfmsClientModule,
+    DlqsClientModule,
     EventEmitterModule.forRoot(),
   ],
   providers: [TaskQueuesProcessor],

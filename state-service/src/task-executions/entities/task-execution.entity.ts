@@ -35,6 +35,9 @@ export class TaskExecution {
   taskRetry: number
 
   @Column({ nullable: true })
+  taskRetryInterval: number
+
+  @Column({ nullable: true })
   taskTimeout: number
 
   @Column("text", { array: true })

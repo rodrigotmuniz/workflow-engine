@@ -11,10 +11,21 @@ export class TaskQueuesClientService {
     private taskQueue: Queue,
   ) {}
 
-  emitEvent(eventType: string, payload: any) {
-    this.logger.log(`emitEvent: ${JSON.stringify({ eventType, payload }, null, 2)}`)
 
-    return this.taskQueue.add(eventType, payload, {  removeOnComplete: true, attempts: 4, backoff:500 })
+  emitEvent(eventType: string, payload: any) {
+    try {
+      this.logger.log(`emitEvents: ${JSON.stringify({ eventType, payload }, null, 2)}`)
+
+      return this.taskQueue.add(eventType, payload, {
+        removeOnComplete: true,
+        attempts: payload.taskRetry,
+        backoff: payload.taskRetryInterval,
+        timeout: payload.taskTimeout,
+      })
+    } catch (error) {
+      this.logger.error(`emitEvents: ${JSON.stringify({ message: error.message }, null, 2)}`)
+      throw error
+    }
   }
 
   async emitEvents(initialExecutions) {

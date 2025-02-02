@@ -69,7 +69,7 @@ export class TaskExecutionsClientService {
     return data
   }
 
-  async update(payload: { id: number, dto: Partial<TaskExecution> }) {
+  async update(payload: { id: number; dto: Partial<TaskExecution> }) {
     const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.update', payload)
     const { data } = await firstValueFrom<{ data: any }>(observable)
     return data
@@ -90,6 +90,7 @@ export class TaskExecutionsClientService {
         definitionId: definition.id,
         taskAction: task.action,
         taskRetry: task.retry,
+        taskRetryInterval: task.retryInterval,
         taskService: task.service,
         taskTimeout: task.timeout,
         taskType: task.type,
