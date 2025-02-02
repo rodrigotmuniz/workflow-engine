@@ -109,7 +109,7 @@ export class WfmsService {
     if (!taskExecution.onSuccess.length && !taskExecution.onFailure.length) {
       await this.wfInstancesClientService.updateState({
         id: taskExecution.wfInstanceId,
-        status: Status.SUCCEEDED,
+        status: success ? Status.SUCCEEDED : Status.FAILED,
       })
     }
   }

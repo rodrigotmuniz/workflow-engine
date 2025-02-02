@@ -14,7 +14,9 @@ export class TaskQueuesProcessor {
     this.logger.log(`emitWfmQueueEvent: ${JSON.stringify({ name: job.name, data: job.data }, null, 2)} | [PID ${process.pid}]`)
 
     setTimeout(() => {
-      this.eventEmitterService.emitWfmQueueEvent(job.name, { data: job.data, success: true })
+      let success = true
+      // if (job.name === 'B')  success = false
+      this.eventEmitterService.emitWfmQueueEvent(job.name, { data: job.data, success })
     }, 0)
   }
 }
