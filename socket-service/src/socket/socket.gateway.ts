@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common'
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -6,43 +6,47 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-} from '@nestjs/websockets';
+} from '@nestjs/websockets'
 
-import { Server } from 'socket.io';
+import { Server } from 'socket.io'
 
 @WebSocketGateway()
-export class SocketGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
-  private readonly logger = new Logger(SocketGateway.name);
+export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+  private readonly logger = new Logger(SocketGateway.name)
 
   @WebSocketServer()
-  socket: Server;
+  socket: Server
 
   afterInit() {
-    this.logger.log('Initialized');
+    this.logger.log('Initialized')
   }
 
   handleConnection(client: any, ...args: any[]) {
-    const { sockets } = this.socket.sockets;
+    const { sockets } = this.socket.sockets
 
-    this.logger.log(`Client id: ${client.id} connected`);
-    this.logger.debug(`Number of connected clients: ${sockets.size}`);
+    this.logger.log(`Client id: ${client.id} connected`)
+    this.logger.debug(`Number of connected clients: ${sockets.size}`)
   }
 
   handleDisconnect(client: any) {
-    this.logger.log(`Cliend id:${client.id} disconnected`);
+    this.logger.log(`Cliend id:${client.id} disconnected`)
+  }
+
+  emit(data) {
+    this.logger.debug(`Payload: ${data}`)
+
+    this.socket.emit('dlq', `2x ${data}`)
   }
 
   @SubscribeMessage('test')
   handleMessage(client: any, data: any) {
-    this.logger.log(`Message received from client id: ${client.id}`);
-    this.logger.debug(`Payload: ${data}`);
+    this.logger.log(`Message received from client id: ${client.id}`)
+    this.logger.debug(`Payload: ${data}`)
 
-    this.socket.emit('dlq', `2x ${data}`);
+    this.socket.emit('dlq', `2x ${data}`)
     return {
       event: 'pong',
       data: 'Wrong data that will make the test fail',
-    };
+    }
   }
 }

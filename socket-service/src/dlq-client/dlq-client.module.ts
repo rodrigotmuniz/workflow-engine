@@ -1,6 +1,7 @@
 import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 import { DlqsClientService } from './dlq-client.service'
+import { DlqProcessor } from './dlq-client.processor'
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { DlqsClientService } from './dlq-client.service'
       },
     }),
   ],
-  providers: [DlqsClientService],
+  providers: [DlqsClientService, DlqProcessor],
   exports: [DlqsClientService],
 })
 export class DlqsClientModule {}
