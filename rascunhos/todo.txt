@@ -1,0 +1,7 @@
+- try catchs
+- auth
+- retries and timeouts
+- task executors / integration services / externals
+- definition verification
+- docker
+- libs with pattern and dto / entites

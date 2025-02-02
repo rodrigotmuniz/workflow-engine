@@ -3,6 +3,7 @@ import { Logger } from '@nestjs/common'
 import { Job } from 'bull'
 import { EventEmitterService } from '../services/event-emitter.service'
 
+let counter = 1
 @Processor(process.env.TASK_QUEUE || 'TASK_QUEUE')
 export class TaskQueuesProcessor {
   private readonly logger = new Logger(TaskQueuesProcessor.name)
@@ -15,8 +16,9 @@ export class TaskQueuesProcessor {
 
     setTimeout(() => {
       let success = true
+      const output = { message: counter++ }
       // if (job.name === 'B')  success = false
-      this.eventEmitterService.emitWfmQueueEvent(job.name, { data: job.data, success })
+      this.eventEmitterService.emitWfmQueueEvent(job.name, { data: { ...job.data, output }, success })
     }, 0)
   }
 }

@@ -3,6 +3,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
 import { TaskExecutionsService } from './task-executions.service'
 import { Status } from './enums/status.enum'
+import { UpdateTaskExecutionDto } from './dto/update-task-execution.dto'
 
 @Controller()
 export class TaskExecutionsController {
@@ -58,6 +59,14 @@ export class TaskExecutionsController {
 
     const { id, status } = payload
     return this.taskExecutionsService.updateStatus(id, status)
+  }
+
+  @MessagePattern('[PATTERN]TaskExecutionsController.update')
+  update(@Payload() payload: { id: number, dto: UpdateTaskExecutionDto }) {
+    this.logger.log(`update: ${JSON.stringify(payload, null, 2)}`)
+
+    const { id, dto } = payload
+    return this.taskExecutionsService.update(id, dto)
   }
 
   // @MessagePattern('[PATTERN]TaskExecutionsController.updateStatus')

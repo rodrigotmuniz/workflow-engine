@@ -6,6 +6,8 @@ import { Status } from '../../commons/enums/status.enum'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
 import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler'
 import { UpdateDefinitionDto } from 'src/definitions-client/dto/update-definition.dto'
+import { CreateDefinitionsTaskInterface } from './interfaces/create-definitions-task.interface'
+import { TaskExecution } from 'src/commons/interfaces/task-execution.interface'
 
 @Injectable()
 export class TaskExecutionsClientService {
@@ -61,8 +63,14 @@ export class TaskExecutionsClientService {
     return data
   }
 
-  async updateStatus(payload: { id: number, status: Status }) {
+  async updateStatus(payload: { id: number; status: Status }) {
     const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.updateStatus', payload)
+    const { data } = await firstValueFrom<{ data: any }>(observable)
+    return data
+  }
+
+  async update(payload: { id: number, dto: Partial<TaskExecution> }) {
+    const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.update', payload)
     const { data } = await firstValueFrom<{ data: any }>(observable)
     return data
   }

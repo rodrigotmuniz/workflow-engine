@@ -1,11 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common'
+import { CurrentStatusType } from 'src/commons/enums/currentStatusType.enum'
 import { Status } from 'src/commons/enums/status.enum'
 import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
 import { TaskExecutionsClientService } from 'src/states-client/task-executions-client/task-executions-client.service'
 import { WfInstancesClientService } from 'src/states-client/wf-instances-client/wf-instances-client.service'
-import { TaskExecution } from '../../commons/entities/task-execution.entity'
+import { TaskExecutionEntity } from '../../commons/entities/task-execution.entity'
 import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
-import { CurrentStatusType } from 'src/commons/enums/currentStatusType.enum'
+import { RunDto } from '../dto/run.dto'
+import { TaskExecution } from 'src/commons/interfaces/task-execution.interface'
 
 @Injectable()
 export class WfmsService {
@@ -17,10 +19,10 @@ export class WfmsService {
     private readonly taskQueuesClientService: TaskQueuesClientService,
   ) {}
 
-  async run(definitionId: string) {
-    this.logger.log(`run: ${JSON.stringify({ definitionId }, null, 2)}`)
+  async run({ body, definitionName }: RunDto) {
+    this.logger.log(`run: ${JSON.stringify({ definitionName, body }, null, 2)}`)
 
-    const taskExecutions = await this.creteInitialState(definitionId)
+    const taskExecutions = await this.creteInitialState(definitionName)
     const initialExecutions = this.getInitialExecutions(taskExecutions)
 
     await this.wfInstancesClientService.updateState({
@@ -28,9 +30,9 @@ export class WfmsService {
       status: Status.IN_PROGRESS,
     })
 
-    this.initialInitTasks(initialExecutions)
+    this.initialInitTasks(initialExecutions, body)
 
-    return { message: 'Initial events emitted.' }
+    return { message: 'Initial events emitted.' } 
   }
 
   private async creteInitialState(definitionId: string) {
@@ -42,42 +44,50 @@ export class WfmsService {
     return taskExecutions
   }
 
-  private getInitialExecutions(taskExecutions) {
+  private getInitialExecutions(taskExecutions: TaskExecution[]) {
     this.logger.log(`getInitialExecutions: ${JSON.stringify({ taskExecutions }, null, 2)}`)
 
-    const initialExecutions = taskExecutions.filter((execution) => !execution.dependencies.length)
+    const initialExecutions = taskExecutions
+      .filter((execution) => !execution.dependencies.length)
+      // .map((execution) => ({
+      //   ...execution,
+      //   input: inputBody,
+      // }))
     return initialExecutions
   }
 
-  async initTasks(initTaskIds: string[], fromTaskId: string, wfInstanceId: number) {
+  async initTasks(initTaskIds: string[], fromTaskId: string, wfInstanceId: number, input: Record<string, any>) {
     this.logger.log(`initTasks: ${JSON.stringify({ initTaskIds, fromTaskId, wfInstanceId }, null, 2)}`)
 
     const updatedTaskExecutions = await this.taskExecutionsClientService.removeDependencyByIds(initTaskIds, wfInstanceId, fromTaskId)
     this.logger.debug(`updatedTasks: ${JSON.stringify(updatedTaskExecutions, null, 2)}`)
 
     for (let updatedTaskExecution of updatedTaskExecutions) {
-      this.initTask(updatedTaskExecution)
+      this.initTask(updatedTaskExecution, input)
     }
     return updatedTaskExecutions
   }
 
-  async initialInitTasks(initialExecutions: TaskExecution[]) {
+  async initialInitTasks(initialExecutions: TaskExecution[], input: Record<string, any>) {
     this.logger.log(`initialInitTasks: ${JSON.stringify({ initialExecutions }, null, 2)}`)
 
     for (let initialExecution of initialExecutions) {
-      this.initTask(initialExecution)
+      this.initTask(initialExecution, input)
     }
   }
 
-  private async initTask(taskExecution: TaskExecution) {
+  private async initTask(taskExecution: TaskExecution, input: Record<string, any>) {
     this.logger.log(`initTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
 
     if (taskExecution.dependencies.length) {
       await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.WAITING_FOR_DEPENDENCY })
     } else {
-      const updateStatus = await this.taskExecutionsClientService.updateStatus({
+      const updateStatus = await this.taskExecutionsClientService.update({
         id: taskExecution.id,
-        status: Status.IN_PROGRESS,
+        dto: {
+          status: Status.IN_PROGRESS,
+          input,
+        },
       })
 
       await this.wfInstancesClientService.updateCurrentState({
@@ -92,12 +102,15 @@ export class WfmsService {
     }
   }
 
-  async completeTask(taskExecution: TaskExecution, success: boolean) {
+  async completeTask(taskExecution: TaskExecutionEntity, success: boolean) {
     this.logger.log(`completeTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
 
-    await this.taskExecutionsClientService.updateStatus({
+    await this.taskExecutionsClientService.update({
       id: taskExecution.id,
-      status: success ? Status.SUCCEEDED : Status.FAILED,
+      dto: {
+        status: success ? Status.SUCCEEDED : Status.FAILED,
+        output: taskExecution.output
+      }
     })
 
     await this.wfInstancesClientService.updateCurrentState({

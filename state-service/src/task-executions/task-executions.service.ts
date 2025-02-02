@@ -58,6 +58,13 @@ export class TaskExecutionsService {
     return updatedTaskExecution
   }
 
+  async update(id: number, dto: UpdateTaskExecutionDto) {
+    this.logger.log(`update(): ${JSON.stringify({ id, dto }, null, 2)}`)
+
+    const updatedTaskExecution = await this.repository.update({ id }, dto)
+    return updatedTaskExecution
+  }
+
   async findOneByTaskIdAndWfInstanceId(taskId: string, wfInstanceId: number) {
     return this.repository.findOneBy({ taskId, wfInstanceId })
   }

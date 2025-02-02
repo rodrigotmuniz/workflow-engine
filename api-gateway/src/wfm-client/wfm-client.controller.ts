@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Inject, Logger, Post } from '@nestjs/common'
+import { Body, Controller, Get, Inject, Logger, Param, Post } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
+import { RunDto } from './dto/run.dto'
 
 @Controller('wfm')
 export class WfmClientController {
@@ -10,10 +11,11 @@ export class WfmClientController {
     private readonly clientProxy: ClientProxy,
   ) {}
 
-  @Post('run')
-  run(@Body() dto: any) {
-    this.logger.log(`run(@Body() ${dto}: any)`)
+  @Post('run/:definitionName')
+  run(@Param('definitionName') definitionName: string, @Body() body: Record<string, any>) {
+    this.logger.log(`run: ${JSON.stringify({ definitionName, body }, null, 2)}`)
 
-    return this.clientProxy.send('[PATTERN]wfm.run', dto)
+    const payload: RunDto = { definitionName, body }
+    return this.clientProxy.send('[PATTERN]wfm.run', payload)
   }
 }
