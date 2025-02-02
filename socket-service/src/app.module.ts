@@ -1,8 +1,7 @@
 import { Module } from '@nestjs/common'
-import { SocketModule } from './socket/socket.module'
-import { DlqsClientModule } from './dlq-client/dlq-client.module'
+import { LogsClientModule } from './logs-client/logs-client.module'
 
 @Module({
-  imports: [DlqsClientModule],
+  imports: [LogsClientModule],
 })
 export class AppModule {}

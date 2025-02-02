@@ -32,9 +32,9 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     this.logger.log(`Cliend id:${client.id} disconnected`)
   }
 
-  emitDlq(data) {
+  emitLog(data) {
     this.logger.debug(`Payload: ${data}`)
-    this.socket.emit('dlq', data)
+    this.socket.emit('logs', data)
   }
 
   @SubscribeMessage('test')

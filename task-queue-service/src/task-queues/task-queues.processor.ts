@@ -2,6 +2,7 @@ import { Process, Processor } from '@nestjs/bull'
 import { InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common'
 import { Job } from 'bull'
 import { DlqsClientService } from 'src/dlq-client/dlq-client.service'
+import { LogsClientService } from 'src/logs-client/logs-client.service'
 import { WfmsClientService } from 'src/wfm-client/wfm-client.service'
 
 let counter = 1
@@ -12,6 +13,7 @@ export class TaskQueuesProcessor {
   constructor(
     private readonly wfmsClientService: WfmsClientService,
     private readonly dlqsClientService: DlqsClientService,
+    private readonly logsClientService: LogsClientService,
   ) {}
 
   @Process('*')
@@ -33,6 +35,7 @@ export class TaskQueuesProcessor {
 
       if (job.attemptsMade + 1 === Number(job.opts.attempts || 1)) {
         this.dlqsClientService.emitEvent(job.name, { ...job.data, success: false })
+        this.logsClientService.emitEvent(job.name, { ...job.data, success: false })
         this.wfmsClientService.emitEvent(job.name, { data: { ...job.data, message: 'Error' }, success: false })
         throw new ServiceUnavailableException(errorMessage)
       }

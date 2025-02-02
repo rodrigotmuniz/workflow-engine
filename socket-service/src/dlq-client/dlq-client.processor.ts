@@ -14,7 +14,7 @@ export class DlqProcessor {
     // try {
     this.logger.log(`handleTask: ${JSON.stringify({ name: job.name }, null, 2)} | [PID ${process.pid}]`)
 
-    this.socketGateway.emitDlq('bla')
+    this.socketGateway.emitLog('bla')
 
     const jobData = job.data
     // this.logger.debug(`Init: ${JSON.stringify({ data: jobData.data }, null, 2)}`)
