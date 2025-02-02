@@ -1,10 +1,10 @@
-- try catchs
+- websocket
 - auth
-- task executors / integration services / externals
+- libs with pattern and dto / entites
 - definition verification
 - docker
-- libs with pattern and dto / entites
+- task executors / integration services / externals
 
 
-
+- try catchs
 - retries and timeouts
