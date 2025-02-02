@@ -3,7 +3,7 @@ import { SocketGateway } from './socket.gateway'
 import { DlqsClientModule } from 'src/dlq-client/dlq-client.module'
 
 @Module({
-  imports: [DlqsClientModule],
+  imports: [],
   providers: [SocketGateway],
   exports: [SocketGateway],
 })

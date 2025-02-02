@@ -146,7 +146,7 @@ export class TaskExecutionsClientService {
           definitionId: definition.id,
           taskAction: task.action,
           taskRetry: task.retry,
-          taskRetryInterval: task.retryInterval,
+          // taskRetryInterval: task.retryInterval,
           taskService: task.service,
           taskTimeout: task.timeout,
           taskType: task.type,
