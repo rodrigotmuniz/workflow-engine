@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bull'
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { Queue } from 'bull'
 
 @Injectable()
@@ -11,10 +11,9 @@ export class TaskQueuesClientService {
     private taskQueue: Queue,
   ) {}
 
-
   emitEvent(eventType: string, payload: any) {
     try {
-      this.logger.log(`emitEvents: ${JSON.stringify({ eventType, payload }, null, 2)}`)
+      this.logger.log(`emitEvent: ${JSON.stringify({ eventType, payload }, null, 2)}`)
 
       return this.taskQueue.add(eventType, payload, {
         removeOnComplete: true,
@@ -23,15 +22,22 @@ export class TaskQueuesClientService {
         timeout: payload.taskTimeout,
       })
     } catch (error) {
-      this.logger.error(`emitEvents: ${JSON.stringify({ message: error.message }, null, 2)}`)
-      throw error
+      this.logger.error(`emitEvent: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 
   async emitEvents(initialExecutions) {
-    this.logger.log(`emitEvents: ${JSON.stringify({ initialExecutions }, null, 2)}`)
+    try {
+      this.logger.log(`emitEvents: ${JSON.stringify({ initialExecutions }, null, 2)}`)
 
-    const tasksPromises = initialExecutions.map((execution) => this.emitEvent(execution.taskId, execution))
-    await Promise.all(tasksPromises)
+      const tasksPromises = initialExecutions.map((execution) => this.emitEvent(execution.taskId, execution))
+      await Promise.all(tasksPromises)
+    } catch (error) {
+      this.logger.error(`emitEvents: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 }

@@ -7,12 +7,14 @@ import { TaskQueuesClientModule } from 'src/task-queues-client/task-queues-clien
 import { WfmsProcessor } from './processors/wfms.processor'
 import { WfmsService } from './services/wfms.service'
 import { WfmsController } from './wfms.controller'
+import { DlqsClientModule } from 'src/dlq-client/dlq-client.module'
 
 @Module({
   imports: [
     DefinitionsClientModule,
     StatesClientModule,
     TaskQueuesClientModule,
+    DlqsClientModule,
     BullModule.registerQueue({
       name: process.env.WFM_QUEUE || 'WFM_QUEUE',
       redis: {

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { CreateWfInstanceDto } from '../dto/create-wf-instance.dto'
@@ -16,49 +16,53 @@ export class WfInstancesService {
   ) {}
 
   async create(createWfInstanceDto: CreateWfInstanceDto) {
-    this.logger.log(`create: ${JSON.stringify({ createWfInstanceDto }, null, 2)}`)
+    try {
+      this.logger.log(`create: ${JSON.stringify({ createWfInstanceDto }, null, 2)}`)
 
-    this.logger.log('Creating new wfInstance...')
+      const newWfInstance = this.repository.create(createWfInstanceDto)
+      const saveWfInstance = await this.repository.save(newWfInstance)
 
-    const newWfInstance = this.repository.create(createWfInstanceDto)
-    const saveWfInstance = await this.repository.save(newWfInstance)
+      this.logger.log(`wfInstance created with ID: ${saveWfInstance.id}`)
+      return saveWfInstance
+    } catch (error) {
+      this.logger.error(`create: ${JSON.stringify({ message: error.message }, null, 2)}`)
 
-    this.logger.log(`wfInstance created with ID: ${saveWfInstance.id}`)
-    return saveWfInstance
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async updateState(id: number, status: Status) {
-    this.logger.log(`updateState: ${JSON.stringify({ id, status }, null, 2)}`)
+    try {
+      this.logger.log(`updateState: ${JSON.stringify({ id, status }, null, 2)}`)
 
-    const updatedStatus = await this.repository.update({ id }, { status })
-    return updatedStatus
+      const updatedStatus = await this.repository.update({ id }, { status })
+      return updatedStatus
+    } catch (error) {
+      this.logger.error(`updateState: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async updateCurrentState(id: number, taskId: string, type: CurrentStatusType) {
     try {
       this.logger.log(`updateCurrentState: ${JSON.stringify({ id, taskId, type }, null, 2)}`)
-  
+
       const currentStates = () => {
         const arrayType = type.toLocaleLowerCase()
         return `array_${arrayType}(currentStates, '${taskId}')`
       }
-  
-      const result = await this.repository
+      await this.repository //
         .createQueryBuilder()
         .update(WfInstance)
         .set({ currentStates })
         .where('id = :id', { id })
-        // .returning('*')
         .execute()
-    }catch(error) {
-      const errorMessage = `updateCurrentState: ${JSON.stringify({ error }, null, 2)}`
-      this.logger.error(errorMessage)
 
-      throw new Error(errorMessage) // ! TODO: Improve it
+    } catch (error) {
+      this.logger.error(`updateCurrentState: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
     }
-
-
-    // const updatedStatus = await this.repository.update({ id }, { status })
-    // return updatedStatus
   }
 }

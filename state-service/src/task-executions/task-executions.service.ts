@@ -1,9 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { In, QueryFailedError, Repository } from 'typeorm'
+import { Repository } from 'typeorm'
 import { CreateTaskExecutionDto } from './dto/create-task-execution.dto'
 import { TaskExecution } from './entities/task-execution.entity'
-import { plainToClass } from 'class-transformer'
 import { Status } from './enums/status.enum'
 import { UpdateTaskExecutionDto } from './dto/update-task-execution.dto'
 
@@ -17,56 +16,83 @@ export class TaskExecutionsService {
   ) {}
 
   async create(createTaskExecutionDto: CreateTaskExecutionDto) {
-    this.logger.log('Creating new taskExecution...')
+    try {
+      this.logger.log(`create: ${JSON.stringify({ createTaskExecutionDto }, null, 2)}`)
 
-    const newTaskExecution = this.repository.create(createTaskExecutionDto)
-    const saveTaskExecution = await this.repository.save(newTaskExecution)
+      const newTaskExecution = this.repository.create(createTaskExecutionDto)
+      const saveTaskExecution = await this.repository.save(newTaskExecution)
 
-    this.logger.log(`taskExecution created with ID: ${saveTaskExecution.id}`)
-    return saveTaskExecution
+      return saveTaskExecution
+    } catch (error) {
+      this.logger.error(`create: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async createMany(createTaskExecutionDtos: CreateTaskExecutionDto[]) {
-    this.logger.log(`createMany(): ${JSON.stringify(createTaskExecutionDtos, null, 2)}`)
+    try {
+      this.logger.log(`createMany: ${JSON.stringify({ createTaskExecutionDtos }, null, 2)}`)
 
-    const newTaskExecutions = createTaskExecutionDtos.map((createTaskExecutionDto) => this.repository.create(createTaskExecutionDto))
-    const saveTaskExecutions = await this.repository.save(newTaskExecutions)
+      const newTaskExecutions = createTaskExecutionDtos.map((createTaskExecutionDto) => this.repository.create(createTaskExecutionDto))
+      const saveTaskExecutions = await this.repository.save(newTaskExecutions)
 
-    this.logger.log(`taskExecutions created with IDs: ${saveTaskExecutions.map((e) => e.id)}`)
-    return saveTaskExecutions
+      return saveTaskExecutions
+    } catch (error) {
+      this.logger.error(`createMany: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async findById(id: number) {
-    return this.repository.findOneBy({ id })
+    try {
+      this.logger.log(`findById: ${JSON.stringify({ id }, null, 2)}`)
+
+      return this.repository.findOneBy({ id })
+    } catch (error) {
+      this.logger.error(`findById: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
-  // async updateStatus(taskId: string, wfInstanceId: number, status: Status) {
-  //   this.logger.log(`updateStatus(): ${JSON.stringify({taskId, wfInstanceId, status}, null, 2)}`)
-
-  //   const updatedTaskExecution = await this.repository.update({ taskId, wfInstanceId }, { status })
-
-  //   this.logger.debug(`updatedTaskExecution: ${JSON.stringify({updatedTaskExecution}, null, 2)}`)
-  //   return updatedTaskExecution
-  // }
-
   async updateStatus(id: number, status: Status) {
-    this.logger.log(`updateStatus(): ${JSON.stringify({ id, status }, null, 2)}`)
+    try {
+      this.logger.log(`updateStatus: ${JSON.stringify({ id, status }, null, 2)}`)
 
-    const updatedTaskExecution = await this.repository.update({ id }, { status })
+      const updatedTaskExecution = await this.repository.update({ id }, { status })
+      return updatedTaskExecution
+    } catch (error) {
+      this.logger.error(`updateStatus: ${JSON.stringify({ message: error.message }, null, 2)}`)
 
-    this.logger.debug(`updatedTaskExecution: ${JSON.stringify({ updatedTaskExecution }, null, 2)}`)
-    return updatedTaskExecution
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async update(id: number, dto: UpdateTaskExecutionDto) {
-    this.logger.log(`update(): ${JSON.stringify({ id, dto }, null, 2)}`)
+    try {
+      this.logger.log(`update: ${JSON.stringify({ id, dto }, null, 2)}`)
 
-    const updatedTaskExecution = await this.repository.update({ id }, dto)
-    return updatedTaskExecution
+      const updatedTaskExecution = await this.repository.update({ id }, dto)
+      return updatedTaskExecution
+    } catch (error) {
+      this.logger.error(`update: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async findOneByTaskIdAndWfInstanceId(taskId: string, wfInstanceId: number) {
-    return this.repository.findOneBy({ taskId, wfInstanceId })
+    try {
+      this.logger.log(`findOneByTaskIdAndWfInstanceId: ${JSON.stringify({ taskId, wfInstanceId }, null, 2)}`)
+
+      return this.repository.findOneBy({ taskId, wfInstanceId })
+    } catch (error) {
+      this.logger.error(`findOneByTaskIdAndWfInstanceId: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async removeDependency(id: number, dependencyId: string) {
@@ -86,10 +112,9 @@ export class TaskExecutionsService {
       const updatedExecution = result.raw[0]
       return updatedExecution
     } catch (error) {
-      const errorMessage = `removeDependency: ${JSON.stringify({ error }, null, 2)}`
-      this.logger.log(errorMessage)
+      this.logger.error(`removeDependency: ${JSON.stringify({ message: error.message }, null, 2)}`)
 
-      throw new Error(errorMessage) // ! TODO: Improve it
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 
@@ -117,10 +142,9 @@ export class TaskExecutionsService {
       const updatedExecution = result.raw
       return updatedExecution
     } catch (error) {
-      const errorMessage = `removeDependencyByIds: ${JSON.stringify({ error }, null, 2)}`
-      this.logger.error(errorMessage)
+      this.logger.error(`removeDependencyByIds: ${JSON.stringify({ message: error.message }, null, 2)}`)
 
-      throw new Error(errorMessage) // ! TODO: Improve it
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 }

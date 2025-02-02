@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bull'
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger, ServiceUnavailableException } from '@nestjs/common'
 import { Queue } from 'bull'
 
 @Injectable()
@@ -13,7 +13,7 @@ export class DlqsClientService {
 
   emitEvent(eventType: string, payload: any) {
     try {
-      this.logger.log(`emitEvents: ${JSON.stringify({ eventType, payload }, null, 2)}`)
+      this.logger.log(`emitEvent: ${JSON.stringify({ eventType, payload }, null, 2)}`)
 
       return this.dlqQueue.add(eventType, payload, {
         removeOnComplete: true,
@@ -21,8 +21,12 @@ export class DlqsClientService {
         backoff: Number(process.env.QUEUE_BACKOFF || 5000),
       })
     } catch (error) {
-      this.logger.error(`emitEvents: ${JSON.stringify({ message: error.message }, null, 2)}`)
-      throw error
+      this.logger.error(`emitEvent: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      if (error.message.includes('queue is not ready')) {
+        throw new ServiceUnavailableException('Queue service is currently unavailable.')
+      }
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 }

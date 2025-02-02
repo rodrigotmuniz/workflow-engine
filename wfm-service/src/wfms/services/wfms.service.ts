@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { CurrentStatusType } from 'src/commons/enums/currentStatusType.enum'
 import { Status } from 'src/commons/enums/status.enum'
 import { DefinitionsClientService } from 'src/definitions-client/definitions-client.service'
@@ -20,110 +20,144 @@ export class WfmsService {
   ) {}
 
   async run({ body, definitionName }: RunDto) {
-    this.logger.log(`run: ${JSON.stringify({ definitionName, body }, null, 2)}`)
+    try {
+      this.logger.log(`run: ${JSON.stringify({ definitionName, body }, null, 2)}`)
 
-    const taskExecutions = await this.creteInitialState(definitionName)
-    const initialExecutions = this.getInitialExecutions(taskExecutions)
+      const taskExecutions = await this.creteInitialState(definitionName)
+      const initialExecutions = this.getInitialExecutions(taskExecutions)
 
-    await this.wfInstancesClientService.updateState({
-      id: initialExecutions[0].wfInstanceId,
-      status: Status.IN_PROGRESS,
-    })
+      await this.wfInstancesClientService.updateState({
+        id: initialExecutions[0].wfInstanceId,
+        status: Status.IN_PROGRESS,
+      })
 
-    this.initialInitTasks(initialExecutions, body)
+      this.initialInitTasks(initialExecutions, body)
 
-    return { message: 'Initial events emitted.' } 
+      return { message: 'Initial events emitted.' }
+    } catch (error) {
+      this.logger.error(`run: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   private async creteInitialState(definitionId: string) {
-    this.logger.log(`creteInitialState: ${JSON.stringify({ definitionId }, null, 2)}`)
+    try {
+      this.logger.log(`creteInitialState: ${JSON.stringify({ definitionId }, null, 2)}`)
 
-    const definition = await this.definitionsClientService.findJsonDefinitionByName(definitionId)
-    const wfInstance = await this.wfInstancesClientService.createByDefinition(definition)
-    const taskExecutions = await this.taskExecutionsClientService.createDefinitionsTask(definition, wfInstance.id)
-    return taskExecutions
+      const definition = await this.definitionsClientService.findJsonDefinitionByName(definitionId)
+      const wfInstance = await this.wfInstancesClientService.createByDefinition(definition)
+      const taskExecutions = await this.taskExecutionsClientService.createDefinitionsTask(definition, wfInstance.id)
+      return taskExecutions
+    } catch (error) {
+      this.logger.error(`creteInitialState: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   private getInitialExecutions(taskExecutions: TaskExecution[]) {
-    this.logger.log(`getInitialExecutions: ${JSON.stringify({ taskExecutions }, null, 2)}`)
+    try {
+      this.logger.log(`getInitialExecutions: ${JSON.stringify({ taskExecutions }, null, 2)}`)
 
-    const initialExecutions = taskExecutions
-      .filter((execution) => !execution.dependencies.length)
-      // .map((execution) => ({
-      //   ...execution,
-      //   input: inputBody,
-      // }))
-    return initialExecutions
+      const initialExecutions = taskExecutions.filter((execution) => !execution.dependencies.length)
+      return initialExecutions
+    } catch (error) {
+      this.logger.error(`getInitialExecutions: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async initTasks(initTaskIds: string[], fromTaskId: string, wfInstanceId: number, input: Record<string, any>) {
-    this.logger.log(`initTasks: ${JSON.stringify({ initTaskIds, fromTaskId, wfInstanceId }, null, 2)}`)
+    try {
+      this.logger.log(`initTasks: ${JSON.stringify({ initTaskIds, fromTaskId, wfInstanceId }, null, 2)}`)
 
-    const updatedTaskExecutions = await this.taskExecutionsClientService.removeDependencyByIds(initTaskIds, wfInstanceId, fromTaskId)
-    this.logger.debug(`updatedTasks: ${JSON.stringify(updatedTaskExecutions, null, 2)}`)
+      const updatedTaskExecutions = await this.taskExecutionsClientService.removeDependencyByIds(initTaskIds, wfInstanceId, fromTaskId)
 
-    for (let updatedTaskExecution of updatedTaskExecutions) {
-      this.initTask(updatedTaskExecution, input)
+      for (let updatedTaskExecution of updatedTaskExecutions) {
+        this.initTask(updatedTaskExecution, input)
+      }
+      return updatedTaskExecutions
+    } catch (error) {
+      this.logger.error(`initTasks: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
     }
-    return updatedTaskExecutions
   }
 
   async initialInitTasks(initialExecutions: TaskExecution[], input: Record<string, any>) {
-    this.logger.log(`initialInitTasks: ${JSON.stringify({ initialExecutions }, null, 2)}`)
+    try {
+      this.logger.log(`initialInitTasks: ${JSON.stringify({ initialExecutions }, null, 2)}`)
 
-    for (let initialExecution of initialExecutions) {
-      this.initTask(initialExecution, input)
+      for (let initialExecution of initialExecutions) {
+        this.initTask(initialExecution, input)
+      }
+    } catch (error) {
+      this.logger.error(`initialInitTasks: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 
   private async initTask(taskExecution: TaskExecution, input: Record<string, any>) {
-    this.logger.log(`initTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
+    try {
+      this.logger.log(`initTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
 
-    if (taskExecution.dependencies.length) {
-      await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.WAITING_FOR_DEPENDENCY })
-    } else {
-      const updateStatus = await this.taskExecutionsClientService.update({
+      if (taskExecution.dependencies.length) {
+        await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.WAITING_FOR_DEPENDENCY })
+      } else {
+        const updateStatus = await this.taskExecutionsClientService.update({
+          id: taskExecution.id,
+          dto: {
+            status: Status.IN_PROGRESS,
+            input,
+          },
+        })
+
+        await this.wfInstancesClientService.updateCurrentState({
+          id: taskExecution.wfInstanceId,
+          taskId: taskExecution.taskId,
+          type: CurrentStatusType.APPEND,
+        })
+
+        this.taskQueuesClientService.emitEvent(taskExecution.taskId, taskExecution)
+      }
+    } catch (error) {
+      this.logger.error(`initTask: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
+  }
+
+  async completeTask(taskExecution: TaskExecutionEntity, success: boolean) {
+    try {
+      this.logger.log(`completeTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
+
+      await this.taskExecutionsClientService.update({
         id: taskExecution.id,
         dto: {
-          status: Status.IN_PROGRESS,
-          input,
+          status: success ? Status.SUCCEEDED : Status.FAILED,
+          output: taskExecution.output,
         },
       })
 
       await this.wfInstancesClientService.updateCurrentState({
         id: taskExecution.wfInstanceId,
         taskId: taskExecution.taskId,
-        type: CurrentStatusType.APPEND,
+        type: CurrentStatusType.REMOVE,
       })
 
-      this.logger.debug(`updateStatus: ${JSON.stringify({ updateStatus }, null, 2)}`)
-
-      this.taskQueuesClientService.emitEvent(taskExecution.taskId, taskExecution)
-    }
-  }
-
-  async completeTask(taskExecution: TaskExecutionEntity, success: boolean) {
-    this.logger.log(`completeTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
-
-    await this.taskExecutionsClientService.update({
-      id: taskExecution.id,
-      dto: {
-        status: success ? Status.SUCCEEDED : Status.FAILED,
-        output: taskExecution.output
+      if (!taskExecution.onSuccess.length && !taskExecution.onFailure.length) {
+        await this.wfInstancesClientService.updateState({
+          id: taskExecution.wfInstanceId,
+          status: success ? Status.SUCCEEDED : Status.FAILED,
+        })
       }
-    })
+    } catch (error) {
+      this.logger.error(`completeTask: ${JSON.stringify({ message: error.message }, null, 2)}`)
 
-    await this.wfInstancesClientService.updateCurrentState({
-      id: taskExecution.wfInstanceId,
-      taskId: taskExecution.taskId,
-      type: CurrentStatusType.REMOVE,
-    })
-
-    if (!taskExecution.onSuccess.length && !taskExecution.onFailure.length) {
-      await this.wfInstancesClientService.updateState({
-        id: taskExecution.wfInstanceId,
-        status: success ? Status.SUCCEEDED : Status.FAILED,
-      })
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 }

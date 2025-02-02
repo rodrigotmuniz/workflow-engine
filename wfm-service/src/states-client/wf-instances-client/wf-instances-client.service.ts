@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { WorkflowDefinitionDto } from 'src/definitions-client/dto/wf-definition.dto'
@@ -17,37 +17,62 @@ export class WfInstancesClientService {
   ) {}
 
   async create(createWfInstanceDto: CreateWfInstanceDto) {
-    const observable = this.clientProxy.send('[PATTERN]WfInstancesController.create', createWfInstanceDto)
-    const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
-    return data
+    try {
+      this.logger.log(`create: ${JSON.stringify({ createWfInstanceDto }, null, 2)}`)
+
+      const observable = this.clientProxy.send('[PATTERN]WfInstancesController.create', createWfInstanceDto)
+      const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
+      return data
+    } catch (error) {
+      this.logger.error(`create: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async updateState(payload: { id: number; status: Status }) {
-    const observable = this.clientProxy.send('[PATTERN]WfInstancesController.updateState', payload)
-    const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
-    return data
+    try {
+      this.logger.log(`updateState: ${JSON.stringify({ payload }, null, 2)}`)
+
+      const observable = this.clientProxy.send('[PATTERN]WfInstancesController.updateState', payload)
+      const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
+      return data
+    } catch (error) {
+      this.logger.error(`updateState: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 
   async updateCurrentState(payload: { id: number; taskId: string; type: CurrentStatusType }) {
     try {
+      this.logger.log(`updateCurrentState: ${JSON.stringify({ payload }, null, 2)}`)
+
       const observable = this.clientProxy.send('[PATTERN]WfInstancesController.updateCurrentState', payload)
       const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
       return data
     } catch (error) {
-      const errorMessage = `updateCurrentState: ${JSON.stringify({ error }, null, 2)}`
-      this.logger.error(errorMessage)
+      this.logger.error(`updateCurrentState: ${JSON.stringify({ message: error.message }, null, 2)}`)
 
-      throw new Error(errorMessage) // ! TODO: Improve it
+      throw new InternalServerErrorException(error.message || error)
     }
   }
 
   async createByDefinition(definition: WorkflowDefinitionDto) {
-    const currentState = definition.tasks[0].id
-    const wfInstance = await this.create({
-      currentStates: [currentState],
-      definitionId: definition.id,
-      status: Status.PENDING,
-    })
-    return wfInstance
+    try {
+      this.logger.log(`createByDefinition: ${JSON.stringify({ definition }, null, 2)}`)
+
+      const currentState = definition.tasks[0].id
+      const wfInstance = await this.create({
+        currentStates: [currentState],
+        definitionId: definition.id,
+        status: Status.PENDING,
+      })
+      return wfInstance
+    } catch (error) {
+      this.logger.error(`createByDefinition: ${JSON.stringify({ message: error.message }, null, 2)}`)
+
+      throw new InternalServerErrorException(error.message || error)
+    }
   }
 }
