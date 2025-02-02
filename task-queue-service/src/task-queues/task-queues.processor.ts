@@ -21,7 +21,7 @@ export class TaskQueuesProcessor {
     this.logger.log(`handleTask: ${JSON.stringify({ name: job.name, data: job.data }, null, 2)} | [PID ${process.pid}]`)
 
     try {
-      throw new Error(job.name)
+      // throw new Error(job.name)
       let success = true
       const output = { message: counter++ }
 

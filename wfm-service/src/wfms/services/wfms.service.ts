@@ -8,6 +8,7 @@ import { TaskExecutionEntity } from '../../commons/entities/task-execution.entit
 import { TaskQueuesClientService } from '../../task-queues-client/task-queues-client.service'
 import { RunDto } from '../dto/run.dto'
 import { TaskExecution } from 'src/commons/interfaces/task-execution.interface'
+import { LogsClientService } from 'src/logs-client/logs-client.service'
 
 @Injectable()
 export class WfmsService {
@@ -17,6 +18,7 @@ export class WfmsService {
     private readonly wfInstancesClientService: WfInstancesClientService,
     private readonly taskExecutionsClientService: TaskExecutionsClientService,
     private readonly taskQueuesClientService: TaskQueuesClientService,
+    private readonly logsClientService: LogsClientService,
   ) {}
 
   async run({ body, definitionName }: RunDto) {
@@ -104,10 +106,13 @@ export class WfmsService {
     try {
       this.logger.log(`initTask: ${JSON.stringify({ taskExecution }, null, 2)}`)
 
+      this.logsClientService.emitInProgress(taskExecution)
+
       if (taskExecution.dependencies.length) {
         await this.taskExecutionsClientService.updateStatus({ id: taskExecution.id, status: Status.WAITING_FOR_DEPENDENCY })
+        this.logsClientService.emitWaitingForPendencies(taskExecution)
       } else {
-        const updateStatus = await this.taskExecutionsClientService.update({
+        await this.taskExecutionsClientService.update({
           id: taskExecution.id,
           dto: {
             status: Status.IN_PROGRESS,
@@ -154,6 +159,7 @@ export class WfmsService {
           status: success ? Status.SUCCEEDED : Status.FAILED,
         })
       }
+      this.logsClientService.emitComplete(taskExecution, success)
     } catch (error) {
       this.logger.error(`completeTask: ${JSON.stringify({ message: error.message }, null, 2)}`)
 

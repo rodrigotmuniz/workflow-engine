@@ -15,10 +15,14 @@ export class LogProcessor {
     this.logger.debug(`handleTask: ${JSON.stringify(job, null, 2)} | [PID ${process.pid}]`)
 
     const { name, data } = job
-    const { definitionId, status, wfInstanceId, taskService: service, taskAction: action, input, id, success } = data
-    const response = { name, definitionId, status, wfInstanceId, service, action, input, id, success }
-
-    this.socketGateway.emitLog(response)
+    if (typeof data === 'string') {
+      this.socketGateway.emitLog(data)
+    } else {
+      const { definitionId, status, wfInstanceId, taskService: service, taskAction: action, input, id, success } = data
+      const response = { name, definitionId, status, wfInstanceId, service, action, input, id, success }
+  
+      this.socketGateway.emitLog(response)
+    }
 
     // this.socketGateway.emitLog('bla')
     // {
