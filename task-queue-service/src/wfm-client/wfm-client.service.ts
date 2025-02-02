@@ -3,18 +3,18 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Queue } from 'bull'
 
 @Injectable()
-export class TaskQueuesClientService {
-  private readonly logger = new Logger(TaskQueuesClientService.name)
+export class WfmsClientService {
+  private readonly logger = new Logger(WfmsClientService.name)
 
   constructor(
-    @InjectQueue(process.env.TASK_QUEUE || 'TASK_QUEUE')
-    private taskQueue: Queue,
+    @InjectQueue(process.env.WFM_QUEUE || 'WFM_QUEUE')
+    private wfmQueue: Queue,
   ) {}
 
   emitEvent(eventType: string, payload: any) {
     this.logger.log(`emitEvent: ${JSON.stringify({ eventType, payload }, null, 2)}`)
 
-    return this.taskQueue.add(eventType, payload, {  removeOnComplete: true, attempts: 4, backoff:500 })
+    return this.wfmQueue.add(eventType, payload, { removeOnComplete: true, attempts: 4, backoff: 500 })
   }
 
   async emitEvents(initialExecutions) {

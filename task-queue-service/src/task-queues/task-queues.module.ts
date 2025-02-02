@@ -2,7 +2,7 @@ import { BullModule } from '@nestjs/bull'
 import { Module } from '@nestjs/common'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 import { TaskQueuesProcessor } from './processors/task-queues.processor'
-import { EventEmitterService } from './services/event-emitter.service'
+import { WfmsClientModule } from 'src/wfm-client/wfm-client.module'
 
 @Module({
   imports: [
@@ -13,15 +13,9 @@ import { EventEmitterService } from './services/event-emitter.service'
         port: Number(process.env.REDIS_PORT || 6000),
       },
     }),
-    BullModule.registerQueue({
-      name: process.env.WFM_QUEUE || 'WFM_QUEUE',
-      redis: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: Number(process.env.REDIS_PORT || 6000),
-      },
-    }),
+    WfmsClientModule,
     EventEmitterModule.forRoot(),
   ],
-  providers: [TaskQueuesProcessor, EventEmitterService],
+  providers: [TaskQueuesProcessor],
 })
 export class TaskQueuesModule {}

@@ -8,8 +8,9 @@ export class WfmsProcessor {
   private readonly logger = new Logger(WfmsProcessor.name)
 
   constructor(private readonly wfmsService: WfmsService) {}
+
   @Process('*')
-  async handleTask(job: Job) {
+  async handleTask2(job: Job) {
     this.logger.log(`emitWfmQueueEvent: ${JSON.stringify({ name: job.name, data: job.data }, null, 2)} | [PID ${process.pid}]`)
 
     const jobData = job.data
