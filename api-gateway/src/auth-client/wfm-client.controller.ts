@@ -1,6 +1,7 @@
 import { Body, Controller, Inject, Logger, Post } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { AuthPayloadDto } from './dto/auth-payload.dto'
+import { AuthPattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Controller('auth')
 export class AuthClientController {
@@ -15,6 +16,6 @@ export class AuthClientController {
   login(@Body() dto: AuthPayloadDto) {
     this.logger.log(`login: ${JSON.stringify({ username: dto.username }, null, 2)}`)
 
-    return this.clientProxy.send('[PATTERN].login', dto)
+    return this.clientProxy.send(AuthPattern.LOGIN, dto)
   }
 }

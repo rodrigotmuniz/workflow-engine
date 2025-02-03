@@ -4,6 +4,7 @@ import { CreateWfInstanceDto } from './dto/create-wf-instance.dto'
 import { WfInstancesService } from './services/wf-instances.service'
 import { Status } from './enums/status.enum'
 import { CurrentStatusType } from './enums/currentStatusType.enum'
+import { WfInstancePattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Controller()
 export class WfInstancesController {
@@ -11,14 +12,14 @@ export class WfInstancesController {
 
   constructor(private readonly wfInstancesService: WfInstancesService) {}
 
-  @MessagePattern('[PATTERN]WfInstancesController.create')
+  @MessagePattern(WfInstancePattern.CREATE)
   create(@Payload() createWfInstanceDto: CreateWfInstanceDto) {
     this.logger.log(`create: ${JSON.stringify({ createWfInstanceDto }, null, 2)}`)
 
     return this.wfInstancesService.create(createWfInstanceDto)
   }
 
-  @MessagePattern('[PATTERN]WfInstancesController.updateState')
+  @MessagePattern(WfInstancePattern.UPDATE_STATE)
   updateState(@Payload() payload: { id: number; status: Status }) {
     this.logger.log(`updateState: ${JSON.stringify({ payload }, null, 2)}`)
 
@@ -26,7 +27,7 @@ export class WfInstancesController {
     return this.wfInstancesService.updateState(id, status)
   }
 
-  @MessagePattern('[PATTERN]WfInstancesController.updateCurrentState')
+  @MessagePattern(WfInstancePattern.UPDATE_CURRENT_STATE)
   updateCurrentState(@Payload() payload: { id: number; taskId: string; type: CurrentStatusType }) {
     this.logger.log(`updateCurrentState: ${JSON.stringify({ payload }, null, 2)}`)
 

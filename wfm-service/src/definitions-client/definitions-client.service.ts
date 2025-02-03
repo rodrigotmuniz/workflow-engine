@@ -2,6 +2,7 @@ import { BadGatewayException, ConflictException, Inject, Injectable, InternalSer
 import { ClientProxy } from '@nestjs/microservices'
 import { firstValueFrom } from 'rxjs'
 import { WorkflowDefinitionDto } from './dto/wf-definition.dto'
+import { DefinitionsPattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Injectable()
 export class DefinitionsClientService {
@@ -16,7 +17,7 @@ export class DefinitionsClientService {
     try {
       this.logger.log(`findJsonDefinitionByName: ${JSON.stringify({ name }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]findJsonDefinitionByName', name)
+      const observable = this.clientProxy.send(DefinitionsPattern.FIND_JSON, name)
       const { data } = await firstValueFrom<{ data: WorkflowDefinitionDto }>(observable)
       return data
     } catch (error) {

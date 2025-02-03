@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Inject, Logger, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
-import { DefinitionsPattern } from '@rodrigotmuniz/patterns'
+import { DefinitionsPattern } from '@rodrigotmuniz/celito-workflow-engine'
 import { Roles } from 'src/commons/auth/decorators/roles.decorator'
 import { ROLES } from 'src/commons/auth/enums/roles.enum'
 import { JwtAuthGuard } from 'src/commons/auth/guards/jwt.guard'
@@ -37,7 +37,7 @@ export class DefinitionsController {
   @Get(':name/json')
   findJsonDefinitionByName(@Param('name') name: string) {
     this.logger.log('findJsonDefinitionByName()')
-    return this.clientProxy.send('findJsonDefinitionByName', name)
+    return this.clientProxy.send(DefinitionsPattern.FIND_JSON, name)
   }
 
   // @Delete(':id')

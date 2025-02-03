@@ -2,6 +2,7 @@ import { Controller, Logger } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
 import { WfmsService } from './services/wfms.service'
 import { RunDto } from './dto/run.dto'
+import { WfmPattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Controller()
 export class WfmsController {
@@ -9,7 +10,7 @@ export class WfmsController {
 
   constructor(private readonly wfmsService: WfmsService) {}
 
-  @MessagePattern('[PATTERN]wfm.run')
+  @MessagePattern(WfmPattern.RUN)
   run(@Payload() payload: RunDto) {
     this.logger.log(`run: ${JSON.stringify(payload, null, 2)}`)
 

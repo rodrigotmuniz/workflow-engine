@@ -1,8 +1,8 @@
 import { Controller, Logger } from '@nestjs/common'
 import { MessagePattern, Payload } from '@nestjs/microservices'
-import { DefinitionsPattern } from '@rodrigotmuniz/patterns'
 import { DefinitionsService } from './definitions.service'
 import { CreateDefinitionDto } from './dto/create-definition.dto'
+import { DefinitionsPattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Controller()
 export class DefinitionsController {
@@ -28,15 +28,9 @@ export class DefinitionsController {
     return this.definitionsService.findByName(name)
   }
 
-  @MessagePattern('[PATTERN]findJsonDefinitionByName')
+  @MessagePattern(DefinitionsPattern.FIND_JSON)
   findJsonDefinitionByName(@Payload() name: string) {
     this.logger.log(`findJsonDefinitionByName(): ${JSON.stringify(name, null, 2)}`)
     return this.definitionsService.findJsonDefinitionByName(name)
   }
-
-  // @MessagePattern(DefinitionsPattern.REMOVE)
-  // remove(@Payload() id: number) {
-  //   this.logger.log('remove()')
-  //   return this.definitionsService.remove(id)
-  // }
 }

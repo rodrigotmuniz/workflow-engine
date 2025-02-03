@@ -28,7 +28,7 @@
     "@nestjs/microservices": "^11.0.7",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
-    "@rodrigotmuniz/patterns": "^2.0.6",
+    "@rodrigotmuniz/celito-workflow-engine": "^1.0.2",
     "bull": "^4.16.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",

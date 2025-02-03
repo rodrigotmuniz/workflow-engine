@@ -6,6 +6,7 @@ import { Status } from '../../commons/enums/status.enum'
 import { CreateWfInstanceDto } from './dto/create-wf-instance.dto'
 import { WfInstance } from './entities/wf-instance.entity'
 import { CurrentStatusType } from '../../commons/enums/currentStatusType.enum'
+import { WfInstancePattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Injectable()
 export class WfInstancesClientService {
@@ -20,7 +21,7 @@ export class WfInstancesClientService {
     try {
       this.logger.log(`create: ${JSON.stringify({ createWfInstanceDto }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]WfInstancesController.create', createWfInstanceDto)
+      const observable = this.clientProxy.send(WfInstancePattern.CREATE, createWfInstanceDto)
       const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
       return data
     } catch (error) {
@@ -34,7 +35,7 @@ export class WfInstancesClientService {
     try {
       this.logger.log(`updateState: ${JSON.stringify({ payload }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]WfInstancesController.updateState', payload)
+      const observable = this.clientProxy.send(WfInstancePattern.UPDATE_STATE, payload)
       const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
       return data
     } catch (error) {
@@ -48,7 +49,7 @@ export class WfInstancesClientService {
     try {
       this.logger.log(`updateCurrentState: ${JSON.stringify({ payload }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]WfInstancesController.updateCurrentState', payload)
+      const observable = this.clientProxy.send(WfInstancePattern.UPDATE_CURRENT_STATE, payload)
       const { data } = await firstValueFrom<{ data: WfInstance }>(observable)
       return data
     } catch (error) {

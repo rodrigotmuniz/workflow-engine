@@ -8,6 +8,7 @@ import { ExceptionsHandler } from '@nestjs/core/exceptions/exceptions-handler'
 import { UpdateDefinitionDto } from 'src/definitions-client/dto/update-definition.dto'
 import { CreateDefinitionsTaskInterface } from './interfaces/create-definitions-task.interface'
 import { TaskExecution } from 'src/commons/interfaces/task-execution.interface'
+import { TaskExecutionPattern } from '@rodrigotmuniz/celito-workflow-engine'
 
 @Injectable()
 export class TaskExecutionsClientService {
@@ -22,7 +23,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`findById: ${JSON.stringify({ id }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.findById', id)
+      const observable = this.clientProxy.send(TaskExecutionPattern.FIND_BY_ID, id)
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
@@ -36,7 +37,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`findOneByTaskIdAndWfInstanceId: ${JSON.stringify({ taskId, wfInstanceId }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.findOneByTaskIdAndWfInstanceId', { taskId, wfInstanceId })
+      const observable = this.clientProxy.send(TaskExecutionPattern.FIND_BY_TASK_AND_WD_INSTANCE, { taskId, wfInstanceId })
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
@@ -50,7 +51,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`removeDependency: ${JSON.stringify({ id, taskId }, null, 2)}`)
   
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.removeDependency', { id, taskId })
+      const observable = this.clientProxy.send(TaskExecutionPattern.REMOVE_DEPENDENCY, { id, taskId })
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
@@ -64,7 +65,7 @@ export class TaskExecutionsClientService {
     try {
         this.logger.log(`removeDependencyByIds: ${JSON.stringify({ taskIds, wfInstanceId, dependencyId }, null, 2)}`)
   
-        const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.removeDependencyByIds', {
+        const observable = this.clientProxy.send(TaskExecutionPattern.REMOVE_DEPENDENCIES_BY_ID, {
           taskIds,
           wfInstanceId,
           dependencyId,
@@ -82,7 +83,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`create: ${JSON.stringify({ createTaskExecutionDto }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.create', createTaskExecutionDto)
+      const observable = this.clientProxy.send(TaskExecutionPattern.CREATE, createTaskExecutionDto)
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
@@ -96,7 +97,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`updateStatus: ${JSON.stringify({ payload }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.updateStatus', payload)
+      const observable = this.clientProxy.send(TaskExecutionPattern.UPDATE_STATUS, payload)
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
@@ -110,7 +111,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`update: ${JSON.stringify({ payload }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.update', payload)
+      const observable = this.clientProxy.send(TaskExecutionPattern.UPDATE, payload)
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
@@ -124,7 +125,7 @@ export class TaskExecutionsClientService {
     try {
       this.logger.log(`createMany: ${JSON.stringify({ createTaskExecutionDtos }, null, 2)}`)
 
-      const observable = this.clientProxy.send('[PATTERN]TaskExecutionsController.createMany', createTaskExecutionDtos)
+      const observable = this.clientProxy.send(TaskExecutionPattern.CREATE_MANY, createTaskExecutionDtos)
       const { data } = await firstValueFrom<{ data: any }>(observable)
       return data
         } catch (error) {
