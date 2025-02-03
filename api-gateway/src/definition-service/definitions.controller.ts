@@ -1,6 +1,9 @@
-import { Body, Controller, Delete, Get, Inject, Logger, Param, ParseIntPipe, Post } from '@nestjs/common'
+import { Body, Controller, Delete, Get, Inject, Logger, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
 import { DefinitionsPattern } from '@rodrigotmuniz/patterns'
+import { Roles } from 'src/commons/auth/decorators/roles.decorator'
+import { ROLES } from 'src/commons/auth/enums/roles.enum'
+import { JwtAuthGuard } from 'src/commons/auth/guards/jwt.guard'
 
 @Controller('definitions')
 export class DefinitionsController {
@@ -12,6 +15,8 @@ export class DefinitionsController {
   ) {}
 
   @Post()
+  @Roles([ROLES.ADMIN, ROLES.USER])
+  @UseGuards(JwtAuthGuard)
   create(@Body() dto: any) {
     this.logger.log('create()')
     return this.clientProxy.send(DefinitionsPattern.CREATE, dto)

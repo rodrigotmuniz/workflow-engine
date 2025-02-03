@@ -15,6 +15,8 @@ export class WfmClientController {
   ) {}
 
   @Post('run/:definitionName')
+  @Roles([ROLES.ADMIN, ROLES.USER])
+  @UseGuards(JwtAuthGuard)
   run(@Param('definitionName') definitionName: string, @Body() body: Record<string, any>) {
     this.logger.log(`run: ${JSON.stringify({ definitionName, body }, null, 2)}`)
 
