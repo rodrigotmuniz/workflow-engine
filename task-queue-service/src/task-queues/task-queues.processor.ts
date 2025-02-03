@@ -25,6 +25,7 @@ export class TaskQueuesProcessor {
       if (['B', 'E'].includes(job.name)) {
         throw new Error(job.name)
       }
+      // Simulating the Task Executors response
       let success = true
       const output = { message: counter++ }
 
