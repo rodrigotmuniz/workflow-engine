@@ -1,7 +1,8 @@
-import { Controller, Logger } from '@nestjs/common'
+import { Controller, Logger, UseGuards } from '@nestjs/common'
 import { AuthService } from './services/auth.service'
 import { MessagePattern, Payload } from '@nestjs/microservices'
-import { CreateAuthDto } from './dto/create-definition.dto'
+import { AuthPayloadDto } from './dto/auth-payload.dto'
+import { AuthGuard } from './guards/auth.guard'
 
 @Controller()
 export class AuthController {
@@ -9,10 +10,9 @@ export class AuthController {
 
   constructor(private readonly authService: AuthService) {}
 
-  @MessagePattern('AuthPattern.CREATE')
-  create() {
-    this.logger.log('create()')
-    return {message: 'ok'}
+  @MessagePattern('[PATTERN].login')
+  @UseGuards(AuthGuard)
+  login(@Payload() payload: AuthPayloadDto) {
+    return this.authService.login(payload)
   }
-
 }

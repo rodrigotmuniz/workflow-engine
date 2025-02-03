@@ -1,6 +1,9 @@
-import { Body, Controller, Get, Inject, Logger, Param, Post } from '@nestjs/common'
-import { ClientProxy } from '@nestjs/microservices'
+import { Body, Controller, Get, Inject, Logger, Param, Post, UseGuards } from '@nestjs/common'
+import { ClientProxy, Payload } from '@nestjs/microservices'
 import { RunDto } from './dto/run.dto'
+import { JwtAuthGuard } from 'src/commons/auth/guards/jwt.guard'
+import { Roles } from 'src/commons/auth/decorators/roles.decorator'
+import { ROLES } from 'src/commons/auth/enums/roles.enum'
 
 @Controller('wfm')
 export class WfmClientController {
@@ -17,10 +20,5 @@ export class WfmClientController {
 
     const payload: RunDto = { definitionName, body }
     return this.clientProxy.send('[PATTERN]wfm.run', payload)
-  }
-
-  @Get()
-  bla() {
-    return this.clientProxy.send('AuthPattern.CREATE', {})
   }
 }
