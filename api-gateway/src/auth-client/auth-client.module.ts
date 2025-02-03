@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ClientsModule } from '@nestjs/microservices'
-import { AuthClientController } from './wfm-client.controller'
+import { AuthClientController } from './auth-client.controller'
 
 @Module({
   imports: [
