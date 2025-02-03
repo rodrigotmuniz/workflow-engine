@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "f60e01ad-6d48-4433-ba78-0310f5d483eb",
+		"name": "workflow-engine",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2006253"
+	},
+	"item": [
+		{
+			"name": "wfm",
+			"item": [
+				{
+					"name": "wfm",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwidXNlcm5hbWUiOiJyb2JlcnRvIiwicm9sZSI6IkFETUlOIiwiaWF0IjoxNzM4NTgzOTcyLCJleHAiOjE3Mzg1ODc1NzJ9.A9JuwkoUlUnomGXfR9M1oWCCmaYa4htWk_-7hPzpV1c",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"param\": 1,\n\t\"anotherParam\": \"two\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/wfm/run/order_processing2",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"wfm",
+								"run",
+								"order_processing2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "definitions",
+			"item": [
+				{
+					"name": "create",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"order_processing2\",\n    \"definition\": \"{\\\"id\\\":\\\"order_processing\\\",\\\"name\\\":\\\"E-commerce Order Processing\\\",\\\"version\\\":\\\"1.5\\\",\\\"description\\\":\\\"Handles order validation, inventory check, payment processing, refund handling, and fulfillment with proper inventory management.\\\",\\\"tasks\\\":[{\\\"id\\\":\\\"A\\\",\\\"type\\\":\\\"service_call\\\",\\\"service\\\":\\\"order-service\\\",\\\"action\\\":\\\"validate\\\",\\\"retry\\\":3,\\\"retryInterval\\\":3000,\\\"timeout\\\":5000,\\\"required\\\":true},{\\\"id\\\":\\\"B\\\",\\\"type\\\":\\\"database_query\\\",\\\"service\\\":\\\"inventory-service\\\",\\\"action\\\":\\\"check_stock\\\",\\\"retry\\\":2,\\\"timeout\\\":3000,\\\"required\\\":true},{\\\"id\\\":\\\"E\\\",\\\"type\\\":\\\"service_call\\\",\\\"service\\\":\\\"order-service\\\",\\\"action\\\":\\\"cancel\\\",\\\"onFailure\\\":true,\\\"required\\\":false},{\\\"id\\\":\\\"C\\\",\\\"type\\\":\\\"external_api\\\",\\\"service\\\":\\\"payment-gateway\\\",\\\"action\\\":\\\"charge\\\",\\\"retry\\\":2,\\\"timeout\\\":7000,\\\"retryInterval\\\":300000,\\\"required\\\":true},{\\\"id\\\":\\\"D\\\",\\\"type\\\":\\\"service_call\\\",\\\"service\\\":\\\"discount-service\\\",\\\"action\\\":\\\"apply\\\",\\\"retry\\\":2,\\\"timeout\\\":4000},{\\\"id\\\":\\\"F\\\",\\\"type\\\":\\\"database_update\\\",\\\"service\\\":\\\"inventory-service\\\",\\\"action\\\":\\\"deduct_stock\\\",\\\"required\\\":true},{\\\"id\\\":\\\"I\\\",\\\"type\\\":\\\"external_api\\\",\\\"service\\\":\\\"payment-gateway\\\",\\\"action\\\":\\\"refund\\\",\\\"onFailure\\\":true,\\\"required\\\":false},{\\\"id\\\":\\\"J\\\",\\\"type\\\":\\\"database_update\\\",\\\"service\\\":\\\"inventory-service\\\",\\\"action\\\":\\\"restock\\\",\\\"onFailure\\\":true,\\\"required\\\":false},{\\\"id\\\":\\\"H\\\",\\\"type\\\":\\\"notification\\\",\\\"service\\\":\\\"email-service\\\",\\\"action\\\":\\\"send\\\",\\\"retry\\\":1,\\\"required\\\":true},{\\\"id\\\":\\\"G\\\",\\\"type\\\":\\\"notification\\\",\\\"service\\\":\\\"admin-alert-service\\\",\\\"action\\\":\\\"send_alert\\\",\\\"onFailure\\\":true,\\\"required\\\":false}],\\\"transitions\\\":[{\\\"from\\\":[\\\"A\\\"],\\\"to\\\":[\\\"B\\\"],\\\"onSuccess\\\":true},{\\\"from\\\":[\\\"B\\\"],\\\"to\\\":[\\\"C\\\",\\\"D\\\"],\\\"onSuccess\\\":true},{\\\"from\\\":[\\\"B\\\"],\\\"to\\\":[\\\"E\\\"],\\\"onFailure\\\":true},{\\\"from\\\":[\\\"C\\\",\\\"D\\\"],\\\"to\\\":[\\\"F\\\"],\\\"onSuccess\\\":true},{\\\"from\\\":[\\\"C\\\",\\\"D\\\"],\\\"to\\\":[\\\"G\\\"],\\\"onFailure\\\":true},{\\\"from\\\":[\\\"F\\\"],\\\"to\\\":[\\\"H\\\"],\\\"onSuccess\\\":true},{\\\"from\\\":[\\\"F\\\"],\\\"to\\\":[\\\"I\\\"],\\\"onFailure\\\":true},{\\\"from\\\":[\\\"I\\\"],\\\"to\\\":[\\\"J\\\"],\\\"onSuccess\\\":true},{\\\"from\\\":[\\\"I\\\"],\\\"to\\\":[\\\"G\\\"],\\\"onFailure\\\":true}],\\\"validations\\\":{\\\"no_cycles\\\":true,\\\"all_tasks_defined\\\":true,\\\"valid_parallel_execution\\\":true,\\\"required_tasks_must_complete\\\":true}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/definitions",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"definitions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "auth",
+			"item": [
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"username\": \"roberto\",\n\t\"password\": \"filho\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/auth/login",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
